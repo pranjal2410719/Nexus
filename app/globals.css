@@ -55,6 +55,7 @@ body {
   width: 70.4px; height: 70.4px;
   --clr: var(--color-forest-ink);
   --clr-alpha: rgba(26, 51, 0, 0.1);
+  margin-bottom: 12px;
   animation: spinner 1.6s infinite ease;
   transform-style: preserve-3d;
 }
