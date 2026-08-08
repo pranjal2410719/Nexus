@@ -1,0 +1,29 @@
+{
+  "name": "nexus",
+  "version": "3.0.0",
+  "description": "Nexus — open-source, multi-tenant GitHub commit scheduler. Next.js app on Netlify. Isolated per-user commit engine.",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0",
+    "@octokit/rest": "^20.0.2",
+    "next": "^15.3.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
+}

@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Next.js runtime — Netlify's plugin manages the publish directory (.next)
+# and deploys the app. The custom heartbeat scheduled function below coexists.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Custom Netlify Functions (the heartbeat scheduler) are bundled with esbuild
+# and deployed alongside the Next.js app.
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@octokit/rest"]
