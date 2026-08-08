@@ -312,9 +312,8 @@ export default function Home() {
     <div className="wrap">
       {/* ===== Navbar ===== */}
       <nav className="navbar">
-        <a href="/" className="logo-mark">
-          <div className="logo-sq">NX</div>
-          <div className="logo-text">Nexus</div>
+        <a href="/" className="logo-mark" aria-label="Nexus home">
+          <div className="logo-sq">N</div>
         </a>
 
         <div className="nav-center">
@@ -359,9 +358,8 @@ export default function Home() {
       >
         <div className="mobile-menu-panel">
           <div className="mobile-menu-header">
-            <a href="/" className="logo-mark" style={{ gap: 8 }}>
-              <div className="logo-sq">NX</div>
-              <div className="logo-text">Nexus</div>
+            <a href="/" className="logo-mark" style={{ gap: 8 }} aria-label="Nexus home">
+              <div className="logo-sq">N</div>
             </a>
             <button className="mobile-menu-close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
