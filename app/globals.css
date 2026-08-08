@@ -261,6 +261,18 @@ h1.hero-title { font-family: var(--font-bricolage-grotesque); font-weight: 800; 
 }
 .slot-add:hover { border-color: var(--color-forest-ink); }
 
+.slot-limit-msg {
+  border: 1px dashed var(--color-terracotta);
+  background: rgba(203, 85, 33, 0.08);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-terracotta);
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
 /* Radio button group for commit count */
 .slot-count-radio {
   display: inline-flex;

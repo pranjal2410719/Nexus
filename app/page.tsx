@@ -53,6 +53,7 @@ export default function Home() {
   const [slots, setSlots] = useState<ScheduleSlot[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [flashMsg, setFlashMsg] = useState("");
+  const [slotLimitMsg, setSlotLimitMsg] = useState("");
   const [saveStatus, setSaveStatus] = useState<{
     text: string;
     kind: "" | "ok" | "err";
@@ -190,7 +191,8 @@ export default function Home() {
 // ---------- Slots editor ----------
   function addSlot() {
     if (slots.length >= 3) {
-      setFlashMsg("Maximum 3 slots allowed. Upcoming feature will allow more.");
+      setSlotLimitMsg("Maximum 3 slots allowed. Upcoming feature will allow more.");
+      setTimeout(() => setSlotLimitMsg(""), 5000);
       return;
     }
     setSlots([...slots, { time: "12:00", count: 1, lastRun: null }]);
@@ -796,9 +798,13 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <button type="button" className="slot-add" onClick={addSlot}>
-              + Add slot
-            </button>
+            {slotLimitMsg ? (
+              <div className="slot-limit-msg">{slotLimitMsg}</div>
+            ) : (
+              <button type="button" className="slot-add" onClick={addSlot}>
+                + Add slot
+              </button>
+            )}
 
             <div style={{ marginTop: 24 }}>
               <button className="btn-save" onClick={saveConfig}>
