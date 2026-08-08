@@ -54,6 +54,7 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [flashMsg, setFlashMsg] = useState("");
   const [slotLimitMsg, setSlotLimitMsg] = useState("");
+  const [manualLimitMsg, setManualLimitMsg] = useState("");
   const [saveStatus, setSaveStatus] = useState<{
     text: string;
     kind: "" | "ok" | "err";
@@ -162,6 +163,18 @@ export default function Home() {
   useEffect(() => {
     refreshHealth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Reset manual limit message at midnight
+  useEffect(() => {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    const msUntilMidnight = midnight.getTime() - now.getTime();
+    const timer = setTimeout(() => {
+      setManualLimitMsg("");
+    }, msUntilMidnight);
+    return () => clearTimeout(timer);
   }, []);
 
   // ---------- Repo picker ----------
@@ -281,6 +294,14 @@ export default function Home() {
             btnText: "Dispatch Instant Commit",
           }));
         }, 2500);
+      } else if (res.status === 429) {
+        // Daily limit exceeded
+        setManualLimitMsg(data.error || "Daily manual commit limit reached. Resets at midnight.");
+        setDispatch((d) => ({
+          ...d,
+          busy: false,
+          btnText: "Dispatch Instant Commit",
+        }));
       } else {
         throw new Error(data.error || "Dispatch failed");
       }
@@ -827,23 +848,27 @@ export default function Home() {
 
           <div className="section-label" id="dispatchSection">
             Step 2 · Instant dispatch
-          </div>
-          <div className="panel" id="dispatchPanel">
-            <h2>Fire a Commit Right Now</h2>
-            <p className="panel-note">
-              Creates one real commit in your connected repository immediately
-              (no schedule needed).
-            </p>
-            <button
-              id="commitBtn"
-              className="primary-cta"
-              onClick={triggerCommit}
-              disabled={dispatch.busy}
-            >
-              <span>→</span>
-              <span>{dispatch.btnText}</span>
-            </button>
-            <div className="reassurance-caption">
+</div>
+            <div className="panel" id="dispatchPanel">
+              <h2>Fire a Commit Right Now</h2>
+              <p className="panel-note">
+                Creates one real commit in your connected repository immediately
+                (no schedule needed).
+              </p>
+              {manualLimitMsg ? (
+                <div className="slot-limit-msg">{manualLimitMsg}</div>
+              ) : (
+                <button
+                  id="commitBtn"
+                  className="primary-cta"
+                  onClick={triggerCommit}
+                  disabled={dispatch.busy}
+                >
+                  <span>→</span>
+                  <span>{dispatch.btnText}</span>
+                </button>
+              )}
+              <div className="reassurance-caption">
               Session: {sessionCount} · Manual Today:{" "}
               <span id="totalManual">{todayCount}</span>
             </div>

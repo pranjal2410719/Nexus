@@ -5,7 +5,7 @@ import { getStoreHandle, getUserByRequest } from "@/lib/auth";
 import { CORS_HEADERS, handleCors, json } from "@/lib/http";
 import { decryptSecret } from "@/lib/security";
 
-const DEFAULT_DAILY_CAP = 50;
+const DEFAULT_DAILY_CAP = 5;
 
 export async function POST(request: Request) {
   const cors = handleCors(request);
