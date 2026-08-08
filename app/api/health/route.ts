@@ -33,11 +33,12 @@ export async function GET() {
     }
   }
 
+  const manualDailyCap = process.env.MANUAL_DAILY_CAP;
   const env = {
     GITHUB_CLIENT_ID: envFlag("GITHUB_CLIENT_ID"),
     GITHUB_CLIENT_SECRET: envFlag("GITHUB_CLIENT_SECRET"),
     BLOBS_MASTER_KEY: envFlag("BLOBS_MASTER_KEY"),
-    MANUAL_DAILY_CAP: envFlag("MANUAL_DAILY_CAP"),
+    MANUAL_DAILY_CAP: manualDailyCap ? manualDailyCap : envFlag("MANUAL_DAILY_CAP"),
   };
 
   const ok =

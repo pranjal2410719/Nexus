@@ -72,27 +72,6 @@ export default function Home() {
   const [sessionCount, setSessionCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // ---------- Health status (landing card) ----------
-  interface HealthEnv {
-    GITHUB_CLIENT_ID: string;
-    GITHUB_CLIENT_SECRET: string;
-    BLOBS_MASTER_KEY: string;
-    MANUAL_DAILY_CAP: string;
-  }
-  interface HealthReport {
-    ok: boolean;
-    service: string;
-    node: string;
-    environment: string;
-    onNetlify: boolean;
-    store: { mode: string; roundtrip: string; detail?: string };
-    env: HealthEnv;
-  }
-  const [health, setHealth] = useState<HealthReport | null>(null);
-  const [healthError, setHealthError] = useState("");
-  const [healthLoading, setHealthLoading] = useState(true);
-  const [healthCheckedAt, setHealthCheckedAt] = useState<string | null>(null);
-
   const todayKey = `nexus_manual_${new Date().toDateString()}`;
 
   // ---------- Mobile menu ----------
@@ -141,27 +120,6 @@ export default function Home() {
       }
       setLoading(false);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // ---------- Health status ----------
-  async function refreshHealth() {
-    setHealthLoading(true);
-    setHealthError("");
-    try {
-      const res = await fetch("/api/health");
-      const data = await res.json();
-      setHealth(data as HealthReport);
-      setHealthCheckedAt(new Date().toLocaleTimeString());
-    } catch (err: any) {
-      setHealthError(err.message || "Health check failed");
-    } finally {
-      setHealthLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    refreshHealth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -531,164 +489,12 @@ export default function Home() {
             free forever · your token is encrypted at rest · only ever touches
             your repos
           </div>
-          <div className="backed-strip">
+<div className="backed-strip">
             <span className="backed-label">Powered by:</span>
             <span className="backed-logo">Next.js</span>
             <span className="backed-logo">GitHub REST API</span>
             <span className="backed-logo">Octokit</span>
             <span className="backed-logo">Netlify Blobs</span>
-          </div>
-
-          {/* ===== Service status card ===== */}
-          <div className="health-card" id="healthCard">
-            <div className="health-top">
-              <span className="health-title">
-                <span
-                  className={
-                    "health-dot " +
-                    (healthLoading
-                      ? "loading"
-                      : healthError
-                        ? "warn"
-                        : health?.ok
-                          ? "ok"
-                          : "warn")
-                  }
-                />
-                Service Status
-              </span>
-              <button
-                className="health-refresh"
-                onClick={refreshHealth}
-                disabled={healthLoading}
-                aria-label="Refresh status"
-              >
-                ↻ Refresh
-              </button>
-            </div>
-            <div className="health-status">
-              {healthLoading
-                ? "Checking…"
-                : healthError
-                  ? "Status unavailable"
-                  : health!.ok
-                    ? "Operational — ready to connect your repo"
-                    : "Attention needed — setup incomplete"}
-            </div>
-            {health && (
-              <>
-                <div className="health-grid">
-                  <div className="health-item">
-                    <span className="label">Store</span>
-                    <span className="value">
-                      {health.store.mode === "netlify-blobs"
-                        ? "Netlify Blobs"
-                        : health.store.mode === "local-file"
-                          ? "Local file store"
-                          : "Not configured"}
-                      <span
-                        className={
-                          "health-chip " +
-                          (health.store.roundtrip === "ok"
-                            ? "ok"
-                            : health.store.roundtrip === "error"
-                              ? "err"
-                              : "warn")
-                        }
-                      >
-                        {health.store.roundtrip === "ok"
-                          ? "read/write ok"
-                          : health.store.roundtrip === "error"
-                            ? "failed"
-                            : "n/a"}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="health-item">
-                    <span className="label">Runtime</span>
-                    <span className="value">
-                      node {health.node} · {health.environment}
-                      {health.onNetlify ? " · netlify" : ""}
-                    </span>
-                  </div>
-                  <div className="health-item">
-                    <span className="label">OAuth ID</span>
-                    <span className="value">
-                      <span
-                        className={
-                          "health-chip " +
-                          (health.env.GITHUB_CLIENT_ID === "configured"
-                            ? "ok"
-                            : "err")
-                        }
-                      >
-                        {health.env.GITHUB_CLIENT_ID === "configured"
-                          ? "✓ configured"
-                          : "✗ missing"}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="health-item">
-                    <span className="label">OAuth Secret</span>
-                    <span className="value">
-                      <span
-                        className={
-                          "health-chip " +
-                          (health.env.GITHUB_CLIENT_SECRET === "configured"
-                            ? "ok"
-                            : "err")
-                        }
-                      >
-                        {health.env.GITHUB_CLIENT_SECRET === "configured"
-                          ? "✓ configured"
-                          : "✗ missing"}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="health-item">
-                    <span className="label">Encryption Key</span>
-                    <span className="value">
-                      <span
-                        className={
-                          "health-chip " +
-                          (health.env.BLOBS_MASTER_KEY === "configured"
-                            ? "ok"
-                            : "err")
-                        }
-                      >
-                        {health.env.BLOBS_MASTER_KEY === "configured"
-                          ? "✓ configured"
-                          : "✗ missing"}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="health-item">
-                    <span className="label">Manual Cap</span>
-                    <span className="value">
-                      <span
-                        className={
-                          "health-chip " +
-                          (health.env.MANUAL_DAILY_CAP === "configured"
-                            ? "ok"
-                            : "warn")
-                        }
-                      >
-                        {health.env.MANUAL_DAILY_CAP === "configured"
-                          ? "configured"
-                          : "default 50"}
-                      </span>
-                    </span>
-                  </div>
-                </div>
-                <div className="health-meta">
-                  <span>
-                    {health.service} · checked {healthCheckedAt ?? "…"}
-                  </span>
-                  <span>env values shown as presence flags only</span>
-                </div>
-              </>
-            )}
-            {healthError && <div className="health-err">✗ {healthError}</div>}
           </div>
         </section>
 
