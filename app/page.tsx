@@ -188,9 +188,13 @@ export default function Home() {
 }
 
 // ---------- Slots editor ----------
-  /* function addSlot() {
-    setSlots([...slots, { time: "12:00", count: 3, lastRun: null }]);
-  } */
+  function addSlot() {
+    if (slots.length >= 3) {
+      setFlashMsg("Maximum 3 slots allowed. Upcoming feature will allow more.");
+      return;
+    }
+    setSlots([...slots, { time: "12:00", count: 1, lastRun: null }]);
+  }
 
   function removeSlot(i: number) {
     setSlots(slots.filter((_, idx) => idx !== i));
@@ -792,9 +796,9 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            {/* <button type="button" className="slot-add" onClick={addSlot}>
+            <button type="button" className="slot-add" onClick={addSlot}>
               + Add slot
-            </button> */}
+            </button>
 
             <div style={{ marginTop: 24 }}>
               <button className="btn-save" onClick={saveConfig}>
