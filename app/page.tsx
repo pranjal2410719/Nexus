@@ -330,6 +330,7 @@ export default function Home() {
       <nav className="navbar">
         <a href="/" className="logo-mark" aria-label="Nexus home">
           <div className="logo-sq">N</div>
+          <span className="logo-text">Nexus</span>
         </a>
 
         <div className="nav-center">
@@ -400,6 +401,7 @@ export default function Home() {
               aria-label="Nexus home"
             >
               <div className="logo-sq">N</div>
+              <span className="logo-text">Nexus</span>
             </a>
             <button
               className="mobile-menu-close"
