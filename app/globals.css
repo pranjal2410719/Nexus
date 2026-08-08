@@ -261,6 +261,41 @@ h1.hero-title { font-family: var(--font-bricolage-grotesque); font-weight: 800; 
 }
 .slot-add:hover { border-color: var(--color-forest-ink); }
 
+/* Radio button group for commit count */
+.slot-count-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--color-pencil-gray);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: #fff;
+}
+.slot-count-radio input[type="radio"] {
+  display: none;
+}
+.slot-count-radio label {
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: var(--font-roboto-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-forest-ink);
+  transition: background 0.15s ease, color 0.15s ease;
+  user-select: none;
+}
+.slot-count-radio input[type="radio"]:checked + label {
+  background: var(--color-forest-ink);
+  color: var(--color-cream-paper);
+}
+.slot-count-radio label:hover {
+  background: rgba(26, 51, 0, 0.08);
+}
+.slot-count-radio input[type="radio"]:checked + label:hover {
+  background: var(--color-forest-ink);
+}
+
 .btn-save {
   background: var(--color-forest-ink); color: var(--color-cream-paper);
   border: none; border-radius: 6px; padding: 12px 28px; cursor: pointer;

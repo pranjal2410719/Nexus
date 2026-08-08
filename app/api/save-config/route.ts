@@ -58,8 +58,8 @@ export async function POST(request: Request) {
         return json({ error: `Invalid slot time: ${s?.time}` }, 400);
       }
       const count = Number(s.count);
-      if (!Number.isInteger(count) || count < 1 || count > 10) {
-        return json({ error: `Slot count must be 1-10: ${s?.time}` }, 400);
+      if (!Number.isInteger(count) || count < 1 || count > 3) {
+        return json({ error: `Slot count must be 1-3: ${s?.time}` }, 400);
       }
       slots.push({
         time: s.time,

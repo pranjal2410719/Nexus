@@ -189,7 +189,7 @@ export default function Home() {
 
   // ---------- Slots editor ----------
   function addSlot() {
-    setSlots([...slots, { time: "12:00", count: 5, lastRun: null }]);
+    setSlots([...slots, { time: "12:00", count: 3, lastRun: null }]);
   }
 
   function removeSlot(i: number) {
@@ -752,17 +752,35 @@ export default function Home() {
                     aria-label="Slot time"
                     onChange={(e) => setSlotTime(i, e.target.value)}
                   />
-                  <input
-                    type="number"
-                    min={1}
-                    max={10}
-                    value={slot.count}
-                    style={{ width: 70 }}
-                    aria-label="Commit count"
-                    onChange={(e) =>
-                      setSlotCount(i, parseInt(e.target.value, 10) || 5)
-                    }
-                  />
+                  <fieldset className="slot-count-radio" aria-label="Commit count">
+                    <input
+                      type="radio"
+                      id={`slot-${i}-count-1`}
+                      name={`slot-count-${i}`}
+                      value={1}
+                      checked={slot.count === 1}
+                      onChange={() => setSlotCount(i, 1)}
+                    />
+                    <label htmlFor={`slot-${i}-count-1`}>1</label>
+                    <input
+                      type="radio"
+                      id={`slot-${i}-count-2`}
+                      name={`slot-count-${i}`}
+                      value={2}
+                      checked={slot.count === 2}
+                      onChange={() => setSlotCount(i, 2)}
+                    />
+                    <label htmlFor={`slot-${i}-count-2`}>2</label>
+                    <input
+                      type="radio"
+                      id={`slot-${i}-count-3`}
+                      name={`slot-count-${i}`}
+                      value={3}
+                      checked={slot.count === 3}
+                      onChange={() => setSlotCount(i, 3)}
+                    />
+                    <label htmlFor={`slot-${i}-count-3`}>3</label>
+                  </fieldset>
                   <span className="slot-label">commits at this time</span>
                   <button
                     type="button"
