@@ -163,11 +163,21 @@ export async function getUserByRequest(request: Request): Promise<UserConfig | n
   return getUserById(session.userId);
 }
 
+/**
+ * Whether this user is the designated admin. Controlled by the
+ * ADMIN_GITHUB_LOGIN env var (e.g. "pranjal2410719"). Unset → nobody is admin.
+ */
+export function isAdmin(user: Pick<UserConfig, "githubLogin">): boolean {
+  const adminLogin = process.env.ADMIN_GITHUB_LOGIN;
+  return Boolean(adminLogin && user.githubLogin === adminLogin);
+}
+
 /** Returns a copy of the user config safe to send to the client (no token). */
 export function publicUser(user: UserConfig) {
   return {
     githubId: user.githubId,
     githubLogin: user.githubLogin,
+    isAdmin: isAdmin(user),
     owner: user.owner,
     repo: user.repo,
     targetFile: user.targetFile,

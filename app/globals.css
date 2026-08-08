@@ -448,6 +448,22 @@ h1.hero-title { font-family: var(--font-bricolage-grotesque); font-weight: 800; 
 .matrix-meta { font-family: var(--font-inter); font-size: 13px; color: var(--color-forest-ink); opacity: 0.85; }
 .matrix-empty { font-size: 14px; opacity: 0.7; font-style: italic; }
 
+/* Admin panel */
+.admin-table-wrap { overflow-x: auto; }
+.admin-table { width: 100%; border-collapse: collapse; font-family: var(--font-inter); font-size: 14px; }
+.admin-table th {
+  text-align: left; padding: 10px 12px;
+  font-family: var(--font-roboto-mono); font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  border-bottom: 2px solid var(--color-forest-ink);
+  white-space: nowrap;
+}
+.admin-table td {
+  padding: 10px 12px; border-bottom: 1px solid rgba(182, 182, 182, 0.4);
+  white-space: nowrap;
+}
+.admin-table tbody tr:hover { background: rgba(26, 51, 0, 0.04); }
+
 .flash {
   display: none; padding: 14px 18px; border-radius: 8px; margin-bottom: 24px;
   font-size: 14px; font-weight: 500;

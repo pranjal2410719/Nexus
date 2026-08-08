@@ -45,6 +45,7 @@ interface ScheduleSlot {
 interface UserConfig {
   githubId: string;
   githubLogin: string;
+  isAdmin: boolean;
   owner: string;
   repo: string;
   targetFile: string;
@@ -383,6 +384,11 @@ export default function Home() {
           {loggedIn ? (
             <>
               <span className="nav-user">@{user!.githubLogin}</span>
+              {user!.isAdmin && (
+                <a href="/admin" className="btn-nav-outline">
+                  Admin
+                </a>
+              )}
               <a href="/api/auth/logout" className="btn-nav-outline">
                 Log out
               </a>
@@ -479,6 +485,15 @@ export default function Home() {
             <div className="mobile-menu-actions">
               {loggedIn ? (
                 <>
+                  {user!.isAdmin && (
+                    <a
+                      href="/admin"
+                      className="btn-nav-outline"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Admin
+                    </a>
+                  )}
                   <a href="/api/auth/logout" className="btn-nav-outline">
                     Log out
                   </a>
