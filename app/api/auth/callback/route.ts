@@ -85,10 +85,9 @@ export async function GET(request: Request) {
       targetFile: existing?.targetFile ?? "PROGRESS_LOG.md",
       timezone: existing?.timezone ?? "Asia/Kolkata",
       slots: existing?.slots ?? [
-        { time: "09:00", count: 3, lastRun: null },
-        { time: "10:00", count: 3, lastRun: null },
-        { time: "23:20", count: 3, lastRun: null },
-        { time: "23:59", count: 3, lastRun: null },
+        { time: "09:00", count: 1, lastRun: null },
+        { time: "14:00", count: 1, lastRun: null },
+        { time: "22:00", count: 1, lastRun: null },
       ],
       createdAt: existing?.createdAt ?? new Date().toISOString(),
       updatedAt: new Date().toISOString(),
