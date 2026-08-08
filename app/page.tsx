@@ -40,7 +40,7 @@ const TIMEZONES = [
   "Australia/Sydney",
 ];
 
-const SOURCE_URL = "https://github.com/pranjal2410719/Auto-commit-tool";
+const SOURCE_URL = "https://github.com/pranjal2410719/";
 
 export default function Home() {
   // ---------- State ----------
@@ -53,7 +53,10 @@ export default function Home() {
   const [slots, setSlots] = useState<ScheduleSlot[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [flashMsg, setFlashMsg] = useState("");
-  const [saveStatus, setSaveStatus] = useState<{ text: string; kind: "" | "ok" | "err" }>({ text: "", kind: "" });
+  const [saveStatus, setSaveStatus] = useState<{
+    text: string;
+    kind: "" | "ok" | "err";
+  }>({ text: "", kind: "" });
   const [dispatch, setDispatch] = useState({
     busy: false,
     btnText: "Dispatch Instant Commit",
@@ -229,13 +232,21 @@ export default function Home() {
       setSaveStatus({ text: "✓ Saved", kind: "ok" });
       setTimeout(() => setSaveStatus({ text: "", kind: "" }), 2500);
     } catch (err: any) {
-      setSaveStatus({ text: "✗ " + (err.message || "Save failed"), kind: "err" });
+      setSaveStatus({
+        text: "✗ " + (err.message || "Save failed"),
+        kind: "err",
+      });
     }
   }
 
   // ---------- Manual dispatch ----------
   async function triggerCommit() {
-    setDispatch((d) => ({ ...d, busy: true, btnText: "Dispatching Commit…", show: false }));
+    setDispatch((d) => ({
+      ...d,
+      busy: true,
+      btnText: "Dispatching Commit…",
+      show: false,
+    }));
     try {
       const res = await fetch("/api/commit-now", {
         method: "POST",
@@ -258,7 +269,11 @@ export default function Home() {
           show: true,
         });
         setTimeout(() => {
-          setDispatch((d) => ({ ...d, busy: false, btnText: "Dispatch Instant Commit" }));
+          setDispatch((d) => ({
+            ...d,
+            busy: false,
+            btnText: "Dispatch Instant Commit",
+          }));
         }, 2500);
       } else {
         throw new Error(data.error || "Dispatch failed");
@@ -306,7 +321,8 @@ export default function Home() {
       : "→ Connect a repository below to get started."
     : "—";
 
-  const matrixCards = user && user.slots && user.slots.length > 0 ? user.slots : null;
+  const matrixCards =
+    user && user.slots && user.slots.length > 0 ? user.slots : null;
 
   return (
     <div className="wrap">
@@ -317,20 +333,37 @@ export default function Home() {
         </a>
 
         <div className="nav-center">
-          <a href="#features" className="nav-link">Features</a>
-          <a href="#schedule" className="nav-link">Schedule</a>
-          <a href={SOURCE_URL} target="_blank" rel="noreferrer" className="nav-link">Source ↗</a>
+          <a href="#features" className="nav-link">
+            Features
+          </a>
+          <a href="#schedule" className="nav-link">
+            Schedule
+          </a>
+          <a
+            href={SOURCE_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="nav-link"
+          >
+            Source ↗
+          </a>
         </div>
 
         <div className="nav-actions">
           {loggedIn ? (
             <>
               <span className="nav-user">@{user!.githubLogin}</span>
-              <a href="/api/auth/logout" className="btn-nav-outline">Log out</a>
-              <a href="#configSection" className="btn-nav-filled">→ Dashboard</a>
+              <a href="/api/auth/logout" className="btn-nav-outline">
+                Log out
+              </a>
+              <a href="#configSection" className="btn-nav-filled">
+                → Dashboard
+              </a>
             </>
           ) : (
-            <a href="/api/auth/start" className="btn-nav-filled">Continue with GitHub</a>
+            <a href="/api/auth/start" className="btn-nav-filled">
+              Continue with GitHub
+            </a>
           )}
         </div>
 
@@ -341,7 +374,9 @@ export default function Home() {
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          <span></span><span></span><span></span>
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
       </nav>
 
@@ -358,27 +393,80 @@ export default function Home() {
       >
         <div className="mobile-menu-panel">
           <div className="mobile-menu-header">
-            <a href="/" className="logo-mark" style={{ gap: 8 }} aria-label="Nexus home">
+            <a
+              href="/"
+              className="logo-mark"
+              style={{ gap: 8 }}
+              aria-label="Nexus home"
+            >
               <div className="logo-sq">N</div>
             </a>
-            <button className="mobile-menu-close" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <button
+              className="mobile-menu-close"
+              aria-label="Close menu"
+              onClick={() => setMenuOpen(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
           <div className="mobile-menu-content">
-            <a href="#features" className="nav-link" onClick={() => setMenuOpen(false)}>Features</a>
-            <a href="#schedule" className="nav-link" onClick={() => setMenuOpen(false)}>Schedule</a>
-            <a href={SOURCE_URL} target="_blank" rel="noreferrer" className="nav-link" onClick={() => setMenuOpen(false)}>Source ↗</a>
+            <a
+              href="#features"
+              className="nav-link"
+              onClick={() => setMenuOpen(false)}
+            >
+              Features
+            </a>
+            <a
+              href="#schedule"
+              className="nav-link"
+              onClick={() => setMenuOpen(false)}
+            >
+              Schedule
+            </a>
+            <a
+              href={SOURCE_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="nav-link"
+              onClick={() => setMenuOpen(false)}
+            >
+              Source ↗
+            </a>
             <div className="mobile-menu-actions">
               {loggedIn ? (
                 <>
-                  <a href="/api/auth/logout" className="btn-nav-outline">Log out</a>
-                  <a href="#configSection" className="btn-nav-filled" onClick={() => setMenuOpen(false)}>→ Dashboard</a>
+                  <a href="/api/auth/logout" className="btn-nav-outline">
+                    Log out
+                  </a>
+                  <a
+                    href="#configSection"
+                    className="btn-nav-filled"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    → Dashboard
+                  </a>
                 </>
               ) : (
-                <a href="/api/auth/start" className="btn-nav-filled" onClick={() => setMenuOpen(false)}>Continue with GitHub</a>
+                <a
+                  href="/api/auth/start"
+                  className="btn-nav-filled"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Continue with GitHub
+                </a>
               )}
             </div>
           </div>
@@ -389,18 +477,31 @@ export default function Home() {
         <div className={"flash" + (flashMsg ? " err" : "")}>{flashMsg}</div>
 
         {/* ===== Logged-out Hero ===== */}
-        <section className="hero" id="landingView" style={{ display: !loggedIn && !loading ? "flex" : "none" }}>
-          <div className="tagline-badge">⚡ Open Source · Multi-Tenant Commit Engine</div>
+        <section
+          className="hero"
+          id="landingView"
+          style={{ display: !loggedIn && !loading ? "flex" : "none" }}
+        >
+          <div className="tagline-badge">
+            ⚡ Open Source · Multi-Tenant Commit Engine
+          </div>
           <h1 className="hero-title">
-            Keep Your GitHub <span className="highlight-wash">Active</span> Daily
+            Keep Your GitHub <span className="highlight-wash">Active</span>{" "}
+            Daily
           </h1>
           <p className="hero-subhead">
-            Nexus runs in the background, firing structured commits across timed bursts in <em>your own</em> repository — fully isolated, encrypted, and yours.
+            Nexus runs in the background, firing structured commits across timed
+            bursts in <em>your own</em> repository — fully isolated, encrypted,
+            and yours.
           </p>
           <a href="/api/auth/start" className="primary-cta">
-            <span>→</span><span>Continue with GitHub</span>
+            <span>→</span>
+            <span>Continue with GitHub</span>
           </a>
-          <div className="reassurance-caption">free forever · your token is encrypted at rest · only ever touches your repos</div>
+          <div className="reassurance-caption">
+            free forever · your token is encrypted at rest · only ever touches
+            your repos
+          </div>
           <div className="backed-strip">
             <span className="backed-label">Powered by:</span>
             <span className="backed-logo">Next.js</span>
@@ -414,11 +515,25 @@ export default function Home() {
             <div className="health-top">
               <span className="health-title">
                 <span
-                  className={"health-dot " + (healthLoading ? "loading" : healthError ? "warn" : health?.ok ? "ok" : "warn")}
+                  className={
+                    "health-dot " +
+                    (healthLoading
+                      ? "loading"
+                      : healthError
+                        ? "warn"
+                        : health?.ok
+                          ? "ok"
+                          : "warn")
+                  }
                 />
                 Service Status
               </span>
-              <button className="health-refresh" onClick={refreshHealth} disabled={healthLoading} aria-label="Refresh status">
+              <button
+                className="health-refresh"
+                onClick={refreshHealth}
+                disabled={healthLoading}
+                aria-label="Refresh status"
+              >
                 ↻ Refresh
               </button>
             </div>
@@ -443,9 +558,20 @@ export default function Home() {
                           ? "Local file store"
                           : "Not configured"}
                       <span
-                        className={"health-chip " + (health.store.roundtrip === "ok" ? "ok" : health.store.roundtrip === "error" ? "err" : "warn")}
+                        className={
+                          "health-chip " +
+                          (health.store.roundtrip === "ok"
+                            ? "ok"
+                            : health.store.roundtrip === "error"
+                              ? "err"
+                              : "warn")
+                        }
                       >
-                        {health.store.roundtrip === "ok" ? "read/write ok" : health.store.roundtrip === "error" ? "failed" : "n/a"}
+                        {health.store.roundtrip === "ok"
+                          ? "read/write ok"
+                          : health.store.roundtrip === "error"
+                            ? "failed"
+                            : "n/a"}
                       </span>
                     </span>
                   </div>
@@ -459,38 +585,76 @@ export default function Home() {
                   <div className="health-item">
                     <span className="label">OAuth ID</span>
                     <span className="value">
-                      <span className={"health-chip " + (health.env.GITHUB_CLIENT_ID === "configured" ? "ok" : "err")}>
-                        {health.env.GITHUB_CLIENT_ID === "configured" ? "✓ configured" : "✗ missing"}
+                      <span
+                        className={
+                          "health-chip " +
+                          (health.env.GITHUB_CLIENT_ID === "configured"
+                            ? "ok"
+                            : "err")
+                        }
+                      >
+                        {health.env.GITHUB_CLIENT_ID === "configured"
+                          ? "✓ configured"
+                          : "✗ missing"}
                       </span>
                     </span>
                   </div>
                   <div className="health-item">
                     <span className="label">OAuth Secret</span>
                     <span className="value">
-                      <span className={"health-chip " + (health.env.GITHUB_CLIENT_SECRET === "configured" ? "ok" : "err")}>
-                        {health.env.GITHUB_CLIENT_SECRET === "configured" ? "✓ configured" : "✗ missing"}
+                      <span
+                        className={
+                          "health-chip " +
+                          (health.env.GITHUB_CLIENT_SECRET === "configured"
+                            ? "ok"
+                            : "err")
+                        }
+                      >
+                        {health.env.GITHUB_CLIENT_SECRET === "configured"
+                          ? "✓ configured"
+                          : "✗ missing"}
                       </span>
                     </span>
                   </div>
                   <div className="health-item">
                     <span className="label">Encryption Key</span>
                     <span className="value">
-                      <span className={"health-chip " + (health.env.BLOBS_MASTER_KEY === "configured" ? "ok" : "err")}>
-                        {health.env.BLOBS_MASTER_KEY === "configured" ? "✓ configured" : "✗ missing"}
+                      <span
+                        className={
+                          "health-chip " +
+                          (health.env.BLOBS_MASTER_KEY === "configured"
+                            ? "ok"
+                            : "err")
+                        }
+                      >
+                        {health.env.BLOBS_MASTER_KEY === "configured"
+                          ? "✓ configured"
+                          : "✗ missing"}
                       </span>
                     </span>
                   </div>
                   <div className="health-item">
                     <span className="label">Manual Cap</span>
                     <span className="value">
-                      <span className={"health-chip " + (health.env.MANUAL_DAILY_CAP === "configured" ? "ok" : "warn")}>
-                        {health.env.MANUAL_DAILY_CAP === "configured" ? "configured" : "default 50"}
+                      <span
+                        className={
+                          "health-chip " +
+                          (health.env.MANUAL_DAILY_CAP === "configured"
+                            ? "ok"
+                            : "warn")
+                        }
+                      >
+                        {health.env.MANUAL_DAILY_CAP === "configured"
+                          ? "configured"
+                          : "default 50"}
                       </span>
                     </span>
                   </div>
                 </div>
                 <div className="health-meta">
-                  <span>{health.service} · checked {healthCheckedAt ?? "…"}</span>
+                  <span>
+                    {health.service} · checked {healthCheckedAt ?? "…"}
+                  </span>
                   <span>env values shown as presence flags only</span>
                 </div>
               </>
@@ -508,11 +672,15 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="section-label" id="configSection">Step 1 · Connect your repository</div>
+          <div className="section-label" id="configSection">
+            Step 1 · Connect your repository
+          </div>
           <div className="panel" id="configPanel">
             <h2>Target Repository</h2>
             <p className="panel-note">
-              Nexus commits to a file inside <em>your</em> repository. Everything is isolated per user — no shared identities, no shared files.
+              Nexus commits to a file inside <em>your</em> repository.
+              Everything is isolated per user — no shared identities, no shared
+              files.
             </p>
 
             <div className="field">
@@ -522,13 +690,17 @@ export default function Home() {
                 value={repoVal}
                 onChange={(e) => setRepoVal(e.target.value)}
               >
-                {reposError
-                  ? <option value="">Error loading repos: {reposError}</option>
-                  : repoOptions.length === 0
-                    ? <option value="">Loading your repos…</option>
-                    : repoOptions.map((o) => (
-                        <option key={o.value} value={o.value}>{o.label}</option>
-                      ))}
+                {reposError ? (
+                  <option value="">Error loading repos: {reposError}</option>
+                ) : repoOptions.length === 0 ? (
+                  <option value="">Loading your repos…</option>
+                ) : (
+                  repoOptions.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
 
@@ -544,22 +716,30 @@ export default function Home() {
             </div>
 
             <div className="field">
-              <label htmlFor="timezoneSelect">Timezone (your burst clock)</label>
+              <label htmlFor="timezoneSelect">
+                Timezone (your burst clock)
+              </label>
               <select
                 id="timezoneSelect"
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
               >
                 {timezoneOptions.map((tz) => (
-                  <option key={tz} value={tz}>{tz}</option>
+                  <option key={tz} value={tz}>
+                    {tz}
+                  </option>
                 ))}
               </select>
             </div>
 
-            <div className="section-label" style={{ marginBottom: 16 }}>Schedule Slots (your daily bursts)</div>
+            <div className="section-label" style={{ marginBottom: 16 }}>
+              Schedule Slots (your daily bursts)
+            </div>
             <div id="slotList">
               {slots.length === 0 && (
-                <div className="matrix-empty" style={{ marginBottom: 12 }}>No slots yet — add your first burst below.</div>
+                <div className="matrix-empty" style={{ marginBottom: 12 }}>
+                  No slots yet — add your first burst below.
+                </div>
               )}
               {slots.map((slot, i) => (
                 <div className="slot-row" key={i}>
@@ -577,34 +757,70 @@ export default function Home() {
                     value={slot.count}
                     style={{ width: 70 }}
                     aria-label="Commit count"
-                    onChange={(e) => setSlotCount(i, parseInt(e.target.value, 10) || 5)}
+                    onChange={(e) =>
+                      setSlotCount(i, parseInt(e.target.value, 10) || 5)
+                    }
                   />
                   <span className="slot-label">commits at this time</span>
-                  <button type="button" className="slot-remove" onClick={() => removeSlot(i)}>Remove</button>
+                  <button
+                    type="button"
+                    className="slot-remove"
+                    onClick={() => removeSlot(i)}
+                  >
+                    Remove
+                  </button>
                 </div>
               ))}
             </div>
-            <button type="button" className="slot-add" onClick={addSlot}>+ Add slot</button>
+            <button type="button" className="slot-add" onClick={addSlot}>
+              + Add slot
+            </button>
 
             <div style={{ marginTop: 24 }}>
-              <button className="btn-save" onClick={saveConfig}>Save Configuration</button>
-              <span className={"save-status" + (saveStatus.kind === "ok" ? " ok" : saveStatus.kind === "err" ? " err" : "")}>
+              <button className="btn-save" onClick={saveConfig}>
+                Save Configuration
+              </button>
+              <span
+                className={
+                  "save-status" +
+                  (saveStatus.kind === "ok"
+                    ? " ok"
+                    : saveStatus.kind === "err"
+                      ? " err"
+                      : "")
+                }
+              >
                 {saveStatus.text}
               </span>
             </div>
           </div>
 
-          <div className="section-label" id="dispatchSection">Step 2 · Instant dispatch</div>
+          <div className="section-label" id="dispatchSection">
+            Step 2 · Instant dispatch
+          </div>
           <div className="panel" id="dispatchPanel">
             <h2>Fire a Commit Right Now</h2>
-            <p className="panel-note">Creates one real commit in your connected repository immediately (no schedule needed).</p>
-            <button id="commitBtn" className="primary-cta" onClick={triggerCommit} disabled={dispatch.busy}>
-              <span>→</span><span>{dispatch.btnText}</span>
+            <p className="panel-note">
+              Creates one real commit in your connected repository immediately
+              (no schedule needed).
+            </p>
+            <button
+              id="commitBtn"
+              className="primary-cta"
+              onClick={triggerCommit}
+              disabled={dispatch.busy}
+            >
+              <span>→</span>
+              <span>{dispatch.btnText}</span>
             </button>
             <div className="reassurance-caption">
-              Session: {sessionCount} · Manual Today: <span id="totalManual">{todayCount}</span>
+              Session: {sessionCount} · Manual Today:{" "}
+              <span id="totalManual">{todayCount}</span>
             </div>
-            <div id="consoleContainer" className={"console-container" + (dispatch.show ? " active" : "")}>
+            <div
+              id="consoleContainer"
+              className={"console-container" + (dispatch.show ? " active" : "")}
+            >
               <div className="console-top">
                 <span id="consoleStatus">{dispatch.status}</span>
                 <span id="consoleSha">{dispatch.sha}</span>
@@ -614,7 +830,12 @@ export default function Home() {
                 {dispatch.commitUrl && (
                   <>
                     <br />
-                    <a href={dispatch.commitUrl} target="_blank" rel="noreferrer" className="console-link">
+                    <a
+                      href={dispatch.commitUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="console-link"
+                    >
                       View Commit on GitHub ↗
                     </a>
                   </>
@@ -623,44 +844,62 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="section-label" id="schedule">Your Burst Schedule</div>
+          <div className="section-label" id="schedule">
+            Your Burst Schedule
+          </div>
           <div className="matrix-grid" id="matrixGrid">
             {matrixCards ? (
               matrixCards.map((slot, i) => (
                 <div className="matrix-card" key={i}>
                   <div className="matrix-time">{slot.time}</div>
-                  <div className="matrix-meta">Burst {i + 1} · {slot.count} commits · {user!.timezone}</div>
+                  <div className="matrix-meta">
+                    Burst {i + 1} · {slot.count} commits · {user!.timezone}
+                  </div>
                 </div>
               ))
             ) : (
-              <div className="matrix-empty">No slots configured yet — add bursts in Step 1.</div>
+              <div className="matrix-empty">
+                No slots configured yet — add bursts in Step 1.
+              </div>
             )}
           </div>
         </section>
 
         {/* ===== Feature Cards (both views) ===== */}
-        <div className="section-label" id="features">Feature Surfaces</div>
+        <div className="section-label" id="features">
+          Feature Surfaces
+        </div>
         <div className="cards-grid">
           <div className="sticky-card card-mint">
             <div>
               <div className="card-tag">// 01 ISOLATION</div>
               <div className="card-heading">Per-User Isolation</div>
             </div>
-            <div className="card-body">Your commits run with your own encrypted token against your own repo. No shared identity, no cross-user access — ever.</div>
+            <div className="card-body">
+              Your commits run with your own encrypted token against your own
+              repo. No shared identity, no cross-user access — ever.
+            </div>
           </div>
           <div className="sticky-card card-teal">
             <div>
               <div className="card-tag">// 02 INFRASTRUCTURE</div>
               <div className="card-heading">Serverless Engine</div>
             </div>
-            <div className="card-body">Zero server maintenance. Next.js route handlers + Netlify scheduled heartbeat + GitHub API + Netlify Blobs store, all open source.</div>
+            <div className="card-body">
+              Zero server maintenance. Next.js route handlers + Netlify
+              scheduled heartbeat + GitHub API + Netlify Blobs store, all open
+              source.
+            </div>
           </div>
           <div className="sticky-card card-blush">
             <div>
               <div className="card-tag">// 03 ON-DEMAND</div>
               <div className="card-heading">Instant Dispatch</div>
             </div>
-            <div className="card-body">Manual triggers execute instantly from your dashboard whenever you need an extra commit.</div>
+            <div className="card-body">
+              Manual triggers execute instantly from your dashboard whenever you
+              need an extra commit.
+            </div>
           </div>
         </div>
       </main>
@@ -669,11 +908,17 @@ export default function Home() {
         <span>Nexus — Open Source Commit Engine</span>
         <span>
           Built by{" "}
-          <a href="https://github.com/pranjal2410719" target="_blank" rel="noreferrer">
+          <a
+            href="https://www.linkedin.com/in/-pranjal22/"
+            target="_blank"
+            rel="noreferrer"
+          >
             Pranjal Yadav
           </a>
         </span>
-        <a href={SOURCE_URL} target="_blank" rel="noreferrer">Source on GitHub ↗</a>
+        <a href={SOURCE_URL} target="_blank" rel="noreferrer">
+          GitHub ↗
+        </a>
       </footer>
     </div>
   );
