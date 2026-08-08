@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Loader } from "../components/loader";
 
 interface HealthEnv {
   GITHUB_CLIENT_ID: string;
@@ -46,6 +47,8 @@ export default function StatusPage() {
 
   return (
     <div className="wrap">
+      {healthLoading && <Loader label="Checking service status…" />}
+
       <nav className="navbar">
         <a href="/" className="logo-mark" aria-label="Nexus home">
           <div className="logo-sq">N</div>

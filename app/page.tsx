@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Loader } from "./components/loader";
 import { MenuSelect, type MenuOption } from "./components/menu-select";
 
 // ---------- Inline icons ----------
@@ -102,6 +103,7 @@ export default function Home() {
   const [todayCount, setTodayCount] = useState(0);
   const [sessionCount, setSessionCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [reposLoading, setReposLoading] = useState(false);
 
   const todayKey = `nexus_manual_${new Date().toDateString()}`;
 
@@ -168,6 +170,7 @@ export default function Home() {
 
   // ---------- Repo picker ----------
   async function loadRepos(u: UserConfig) {
+    setReposLoading(true);
     try {
       const res = await fetch("/api/repos");
       const data = await res.json();
@@ -187,8 +190,10 @@ export default function Home() {
     } catch (err: any) {
       setRepos([]);
       setReposError(err.message || "Failed to load repos");
+    } finally {
+      setReposLoading(false);
     }
-}
+  }
 
 // ---------- Slots editor ----------
   function addSlot() {
@@ -309,6 +314,7 @@ export default function Home() {
 
   // ---------- Derived render data ----------
   const loggedIn = !!user;
+  const showLoader = loading || (loggedIn && reposLoading);
 
   const repoOptions = (() => {
     const opts: MenuOption[] = repos.map((r) => ({
@@ -345,6 +351,10 @@ export default function Home() {
 
   return (
     <div className="wrap">
+      {showLoader && (
+        <Loader label={loggedIn ? "Loading your workspace…" : "Loading…"} />
+      )}
+
       {/* ===== Navbar ===== */}
       <nav className="navbar">
         <a href="/" className="logo-mark" aria-label="Nexus home">
