@@ -1,6 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MenuSelect, type MenuOption } from "./components/menu-select";
+
+// ---------- Inline icons ----------
+
+function RepoIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M4 4v2h-.25A1.75 1.75 0 0 0 2 7.75v5.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0 0 14 13.25v-5.5A1.75 1.75 0 0 0 12.25 6H12V4a4 4 0 1 0-8 0Zm6.5 2V4a2.5 2.5 0 0 0-5 0v2Z" />
+    </svg>
+  );
+}
 
 // ---------- Types (public shapes from lib/auth.ts) ----------
 
@@ -280,24 +311,27 @@ export default function Home() {
   const loggedIn = !!user;
 
   const repoOptions = (() => {
-    const opts = repos.map((r) => ({
+    const opts: MenuOption[] = repos.map((r) => ({
       value: `${r.owner}/${r.name}`,
-      label: `${r.full_name}${r.private ? " (private)" : ""}`,
+      label: r.full_name,
+      hint: r.private ? "private" : undefined,
+      icon: r.private ? <LockIcon /> : <RepoIcon />,
     }));
     if (user && user.owner && user.repo) {
       const cur = `${user.owner}/${user.repo}`;
       if (!opts.some((o) => o.value === cur)) {
-        opts.push({ value: cur, label: `${cur} (current)` });
+        opts.push({ value: cur, label: cur, hint: "current", icon: <RepoIcon /> });
       }
     }
     return opts;
   })();
 
   const timezoneOptions = (() => {
-    if (timezone && !TIMEZONES.includes(timezone)) {
-      return [...TIMEZONES, timezone];
-    }
-    return TIMEZONES;
+    const list =
+      timezone && !TIMEZONES.includes(timezone)
+        ? [...TIMEZONES, timezone]
+        : TIMEZONES;
+    return list.map((tz) => ({ value: tz, label: tz }));
   })();
 
   const dashSub = user
@@ -520,23 +554,16 @@ export default function Home() {
 
             <div className="field">
               <label htmlFor="repoSelect">Repository</label>
-              <select
+              <MenuSelect
                 id="repoSelect"
                 value={repoVal}
-                onChange={(e) => setRepoVal(e.target.value)}
-              >
-                {reposError ? (
-                  <option value="">Error loading repos: {reposError}</option>
-                ) : repoOptions.length === 0 ? (
-                  <option value="">Loading your repos…</option>
-                ) : (
-                  repoOptions.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))
-                )}
-              </select>
+                onChange={setRepoVal}
+                options={repoOptions}
+                placeholder="Choose a repository…"
+                menuLabel="Repository"
+                loading={!reposError && repoOptions.length === 0}
+                error={reposError || undefined}
+              />
             </div>
 
             <div className="field">
@@ -554,17 +581,14 @@ export default function Home() {
               <label htmlFor="timezoneSelect">
                 Timezone (your burst clock)
               </label>
-              <select
+              <MenuSelect
                 id="timezoneSelect"
                 value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
-              >
-                {timezoneOptions.map((tz) => (
-                  <option key={tz} value={tz}>
-                    {tz}
-                  </option>
-                ))}
-              </select>
+                onChange={setTimezone}
+                options={timezoneOptions}
+                placeholder="Select timezone…"
+                menuLabel="Timezone"
+              />
             </div>
 
             <div className="section-label" style={{ marginBottom: 16 }}>
