@@ -65,3 +65,28 @@ void solveNQueens(int row, int n, int& count, int cols, int diag1, int diag2) {
     }
 }
 ```
+
+## [2026-08-21 04:15:28 UTC] refactor(dsa/graphs): optimize Dijkstra shortest path using std::priority_queue
+
+**Module:** `dsa/graphs`  
+**Status:** Verified & Compiled  
+
+### Summary
+Replaced linear scan for minimum distance vertex with min-heap accumulator, improving complexity from O(V^2) to O((V + E) log V).
+
+```cpp
+priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+pq.push({0, src});
+dist[src] = 0;
+while (!pq.empty()) {
+    int u = pq.top().second;
+    pq.pop();
+    for (auto& edge : adj[u]) {
+        int v = edge.first, weight = edge.second;
+        if (dist[v] > dist[u] + weight) {
+            dist[v] = dist[u] + weight;
+            pq.push({dist[v], v});
+        }
+    }
+}
+```
