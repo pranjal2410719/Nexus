@@ -1,26 +1,6 @@
 # DSA Practice & Build Activity Log
 
 
-## [2026-08-21 06:15:22 UTC] feat(dsa/backtracking): add N-Queens constraint satisfaction solver
-
-**Module:** `dsa/backtracking`  
-**Status:** Verified & Compiled  
-
-### Summary
-Implemented backtracking solution with bitmasking optimization for diagonal collision detection.
-
-```cpp
-void solveNQueens(int row, int n, int& count, int cols, int diag1, int diag2) {
-    if (row == n) { count++; return; }
-    int availablePositions = ((1 << n) - 1) & ~(cols | diag1 | diag2);
-    while (availablePositions) {
-        int p = availablePositions & -availablePositions;
-        availablePositions -= p;
-        solveNQueens(row + 1, n, count, cols | p, (diag1 | p) << 1, (diag2 | p) >> 1);
-    }
-}
-```
-
 ## [2026-08-21 06:15:23 UTC] refactor(dsa/graphs): optimize Dijkstra shortest path using std::priority_queue
 
 **Module:** `dsa/graphs`  
@@ -91,6 +71,26 @@ void computeLPSArray(string pat, int M, vector<int>& lps) {
 ```
 
 ## [2026-08-22 03:15:23 UTC] feat(dsa/backtracking): add N-Queens constraint satisfaction solver
+
+**Module:** `dsa/backtracking`  
+**Status:** Verified & Compiled  
+
+### Summary
+Implemented backtracking solution with bitmasking optimization for diagonal collision detection.
+
+```cpp
+void solveNQueens(int row, int n, int& count, int cols, int diag1, int diag2) {
+    if (row == n) { count++; return; }
+    int availablePositions = ((1 << n) - 1) & ~(cols | diag1 | diag2);
+    while (availablePositions) {
+        int p = availablePositions & -availablePositions;
+        availablePositions -= p;
+        solveNQueens(row + 1, n, count, cols | p, (diag1 | p) << 1, (diag2 | p) >> 1);
+    }
+}
+```
+
+## [2026-08-22 04:15:22 UTC] feat(dsa/backtracking): add N-Queens constraint satisfaction solver
 
 **Module:** `dsa/backtracking`  
 **Status:** Verified & Compiled  
