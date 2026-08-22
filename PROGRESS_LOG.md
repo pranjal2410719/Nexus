@@ -1,26 +1,6 @@
 # DSA Practice & Build Activity Log
 
 
-## [2026-08-22 03:15:23 UTC] feat(dsa/backtracking): add N-Queens constraint satisfaction solver
-
-**Module:** `dsa/backtracking`  
-**Status:** Verified & Compiled  
-
-### Summary
-Implemented backtracking solution with bitmasking optimization for diagonal collision detection.
-
-```cpp
-void solveNQueens(int row, int n, int& count, int cols, int diag1, int diag2) {
-    if (row == n) { count++; return; }
-    int availablePositions = ((1 << n) - 1) & ~(cols | diag1 | diag2);
-    while (availablePositions) {
-        int p = availablePositions & -availablePositions;
-        availablePositions -= p;
-        solveNQueens(row + 1, n, count, cols | p, (diag1 | p) << 1, (diag2 | p) >> 1);
-    }
-}
-```
-
 ## [2026-08-22 04:15:22 UTC] feat(dsa/backtracking): add N-Queens constraint satisfaction solver
 
 **Module:** `dsa/backtracking`  
@@ -93,3 +73,27 @@ Documented time/space tradeoffs for QuickSort, MergeSort, HeapSort, and Timsort 
 | QuickSort | O(N log N) | O(N log N) | O(N^2) | O(log N) |
 | MergeSort | O(N log N) | O(N log N) | O(N log N) | O(N) |
 | HeapSort | O(N log N) | O(N log N) | O(N log N) | O(1) |
+
+## [2026-08-22 06:15:21 UTC] feat(dsa/trees): implement Binary Search Tree deletion and auto-rebalancing logic
+
+**Module:** `dsa/trees`  
+**Status:** Verified & Compiled  
+
+### Summary
+Added recursive deletion with in-order successor search. Time complexity: O(log N) average, O(N) worst case.
+
+```cpp
+TreeNode* deleteNode(TreeNode* root, int key) {
+    if (!root) return root;
+    if (key < root->val) root->left = deleteNode(root->left, key);
+    else if (key > root->val) root->right = deleteNode(root->right, key);
+    else {
+        if (!root->left) { TreeNode* temp = root->right; delete root; return temp; }
+        else if (!root->right) { TreeNode* temp = root->left; delete root; return temp; }
+        TreeNode* temp = minValueNode(root->right);
+        root->val = temp->val;
+        root->right = deleteNode(root->right, temp->val);
+    }
+    return root;
+}
+```
