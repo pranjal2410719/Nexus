@@ -23,28 +23,6 @@ void computeLPSArray(string pat, int M, vector<int>& lps) {
 }
 ```
 
-## [2026-08-22 03:15:22 UTC] test(dsa/strings): add test cases for KMP string matching edge conditions
-
-**Module:** `dsa/strings`  
-**Status:** Verified & Compiled  
-
-### Summary
-Added unit coverage for empty pattern, single character repeating sequences, and non-matching long prefix cases.
-
-```cpp
-void computeLPSArray(string pat, int M, vector<int>& lps) {
-    int len = 0, i = 1;
-    lps[0] = 0;
-    while (i < M) {
-        if (pat[i] == pat[len]) { len++; lps[i] = len; i++; }
-        else {
-            if (len != 0) len = lps[len - 1];
-            else { lps[i] = 0; i++; }
-        }
-    }
-}
-```
-
 ## [2026-08-22 03:15:23 UTC] feat(dsa/backtracking): add N-Queens constraint satisfaction solver
 
 **Module:** `dsa/backtracking`  
@@ -109,3 +87,17 @@ while (!pq.empty()) {
     }
 }
 ```
+
+## [2026-08-22 04:15:24 UTC] docs(dsa/readme): update complexity analysis summary for Sorting Algorithms
+
+**Module:** `dsa/readme`  
+**Status:** Verified & Compiled  
+
+### Summary
+Documented time/space tradeoffs for QuickSort, MergeSort, HeapSort, and Timsort across best, average, and worst cases.
+
+| Algorithm | Best | Average | Worst | Space |
+|-----------|------|---------|-------|-------|
+| QuickSort | O(N log N) | O(N log N) | O(N^2) | O(log N) |
+| MergeSort | O(N log N) | O(N log N) | O(N log N) | O(N) |
+| HeapSort | O(N log N) | O(N log N) | O(N log N) | O(1) |
