@@ -1,20 +1,6 @@
 # DSA Practice & Build Activity Log
 
 
-## [2026-08-22 04:15:24 UTC] docs(dsa/readme): update complexity analysis summary for Sorting Algorithms
-
-**Module:** `dsa/readme`  
-**Status:** Verified & Compiled  
-
-### Summary
-Documented time/space tradeoffs for QuickSort, MergeSort, HeapSort, and Timsort across best, average, and worst cases.
-
-| Algorithm | Best | Average | Worst | Space |
-|-----------|------|---------|-------|-------|
-| QuickSort | O(N log N) | O(N log N) | O(N^2) | O(log N) |
-| MergeSort | O(N log N) | O(N log N) | O(N log N) | O(N) |
-| HeapSort | O(N log N) | O(N log N) | O(N log N) | O(1) |
-
 ## [2026-08-22 06:15:20 UTC] docs(dsa/readme): update complexity analysis summary for Sorting Algorithms
 
 **Module:** `dsa/readme`  
@@ -102,3 +88,17 @@ while (!pq.empty()) {
     }
 }
 ```
+
+## [2026-08-23 03:15:20 UTC] docs(dsa/readme): update complexity analysis summary for Sorting Algorithms
+
+**Module:** `dsa/readme`  
+**Status:** Verified & Compiled  
+
+### Summary
+Documented time/space tradeoffs for QuickSort, MergeSort, HeapSort, and Timsort across best, average, and worst cases.
+
+| Algorithm | Best | Average | Worst | Space |
+|-----------|------|---------|-------|-------|
+| QuickSort | O(N log N) | O(N log N) | O(N^2) | O(log N) |
+| MergeSort | O(N log N) | O(N log N) | O(N log N) | O(N) |
+| HeapSort | O(N log N) | O(N log N) | O(N log N) | O(1) |
