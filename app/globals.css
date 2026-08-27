@@ -49,8 +49,18 @@ body {
   position: fixed; inset: 0; z-index: 1000;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 24px;
-.loader-built-by {\n  position: absolute;\n  left: 16px;\n  bottom: 16px;\n  font-size: 12px;\n  color: var(--color-forest-ink);\n  opacity: 0.6;\n  text-decoration: none;\n}\n
 }
+
+.loader-built-by {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  font-size: 12px;
+  color: var(--color-forest-ink);
+  opacity: 0.6;
+  text-decoration: none;
+}
+
 .loader-cube {
   width: 70.4px; height: 70.4px;
   --clr: var(--color-forest-ink);
