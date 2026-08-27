@@ -72,6 +72,7 @@ export function Navbar({
         )}
       </div>
 
+      <a href="mailto:2k24.cs1l.2410719@gmail.com" className="btn-report-bug">Report Bug</a>
       <button
         className={"menu-toggle" + (menuOpen ? " open" : "")}
         id="menuToggle"

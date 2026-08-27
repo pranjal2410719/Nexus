@@ -156,9 +156,30 @@ body {
 .menu-toggle.open span:nth-child(2) { opacity: 0; }
 .menu-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+/* Report Bug button */
+.btn-report-bug {
+  background: #e53935; /* red */
+  color: var(--color-cream-paper);
+  border-radius: 6px;
+  padding: 8px 16px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+}
+@media (max-width: 768px) {
+  .btn-report-bug { display: inline-flex; margin-right: 8px; }
+}
+@media (min-width: 769px) {
+  .btn-report-bug { display: none; }
+}
+
 .mobile-menu {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(26, 51, 0, 0.35); backdrop-filter: blur(4px);
+  background: var(--color-cream-paper);
   z-index: 150; display: none; opacity: 0; transition: opacity 0.25s ease;
   padding: 80px 16px 24px;
 }
