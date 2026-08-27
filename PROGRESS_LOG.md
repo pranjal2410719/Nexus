@@ -1,20 +1,6 @@
 # DSA Practice & Build Activity Log
 
 
-## [2026-08-27 03:15:14 UTC] docs(dsa/readme): update complexity analysis summary for Sorting Algorithms
-
-**Module:** `dsa/readme`  
-**Status:** Verified & Compiled  
-
-### Summary
-Documented time/space tradeoffs for QuickSort, MergeSort, HeapSort, and Timsort across best, average, and worst cases.
-
-| Algorithm | Best | Average | Worst | Space |
-|-----------|------|---------|-------|-------|
-| QuickSort | O(N log N) | O(N log N) | O(N^2) | O(log N) |
-| MergeSort | O(N log N) | O(N log N) | O(N log N) | O(N) |
-| HeapSort | O(N log N) | O(N log N) | O(N log N) | O(1) |
-
 ## [2026-08-27 03:15:15 UTC] feat(dsa/trees): implement Binary Search Tree deletion and auto-rebalancing logic
 
 **Module:** `dsa/trees`  
@@ -108,3 +94,17 @@ for (int i = 1; i <= n; i++) {
     }
 }
 ```
+
+## [2026-08-27 04:15:24 UTC] docs(dsa/readme): update complexity analysis summary for Sorting Algorithms
+
+**Module:** `dsa/readme`  
+**Status:** Verified & Compiled  
+
+### Summary
+Documented time/space tradeoffs for QuickSort, MergeSort, HeapSort, and Timsort across best, average, and worst cases.
+
+| Algorithm | Best | Average | Worst | Space |
+|-----------|------|---------|-------|-------|
+| QuickSort | O(N log N) | O(N log N) | O(N^2) | O(log N) |
+| MergeSort | O(N log N) | O(N log N) | O(N log N) | O(N) |
+| HeapSort | O(N log N) | O(N log N) | O(N log N) | O(1) |
