@@ -109,6 +109,9 @@ body {
 .logo-text { font-family: var(--font-inter); font-weight: 700; font-size: 20px; letter-spacing: -0.5px; }
 
 .nav-center { display: flex; gap: 24px; align-items: center; }
+
+/* Desktop navigation links container */
+.nav-links { display: flex; gap: 24px; align-items: center; }
 .nav-link { font-family: var(--font-inter); font-weight: 500; font-size: 14px; color: var(--color-forest-ink); text-decoration: none; transition: opacity 0.15s ease; }
 .nav-link:hover { opacity: 0.7; }
 .nav-actions { display: flex; align-items: center; gap: 12px; }
