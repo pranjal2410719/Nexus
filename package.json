@@ -8,7 +8,10 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"No tests specified\" && exit 0"
+    "test": "node test_file_update.js && node tests/run_all.js",
+    "test:unit": "node test_file_update.js",
+    "test:e2e": "node tests/run_all.js",
+    "test:all": "node test_file_update.js && node tests/run_all.js && node test_adversarial_m1.js"
   },
   "dependencies": {
     "@netlify/blobs": "^8.1.0",

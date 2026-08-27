@@ -1,6 +1,10 @@
 // GET /api/admin/users — admin-only: lists every registered user (tokens stay encrypted).
-import { getStoreHandle, getUserByRequest, isAdmin, publicUser } from "@/lib/auth";
-import { CORS_HEADERS, handleCors, json } from "@/lib/http";
+import { getStoreHandle } from "@/lib/storage/blob-store";
+import { getUserByRequest, publicUser } from "@/lib/auth/user";
+import { isAdmin } from "@/lib/auth/permissions";
+import { CORS_HEADERS, handleCors } from "@/lib/http/cors";
+import { json } from "@/lib/http/response";
+import type { PublicUser } from "@/types/user";
 
 export async function GET(request: Request) {
   const cors = handleCors(request);
@@ -16,7 +20,7 @@ export async function GET(request: Request) {
 
   try {
     const store = getStoreHandle();
-    const users: ReturnType<typeof publicUser>[] = [];
+    const users: PublicUser[] = [];
     const pages = store.list({ prefix: "user:", paginate: true });
     for await (const page of pages) {
       for (const { key } of page.blobs) {

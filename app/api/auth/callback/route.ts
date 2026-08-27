@@ -2,8 +2,12 @@
 // stores the user record (token encrypted at rest), and sets the session cookie.
 // GET /api/auth/callback?code=...&state=...
 import { Octokit } from "@octokit/rest";
-import { createSession, getStoreHandle, saveUser, sessionCookie, type UserConfig } from "@/lib/auth";
-import { encryptSecret } from "@/lib/security";
+import { getStoreHandle } from "@/lib/storage/blob-store";
+import { createSession } from "@/lib/auth/session";
+import { saveUser } from "@/lib/auth/user";
+import { sessionCookie } from "@/lib/auth/cookies";
+import { encryptSecret } from "@/lib/security/encryption";
+import type { UserConfig } from "@/types/user";
 
 function siteOrigin(request: Request): string {
   return process.env.URL ?? process.env.NETLIFY_URL ?? new URL(request.url).origin;
@@ -60,7 +64,8 @@ export async function GET(request: Request) {
     });
     const tokenData = (await tokenRes.json()) as { access_token?: string; error?: string };
     if (!tokenData.access_token) {
-      return redirect(`${siteOrigin(request)}/?error=oauth_failed&detail=${tokenData.error ?? "no_token"}`);
+      const errDetail = encodeURIComponent(tokenData.error ?? "no_token");
+      return redirect(`${siteOrigin(request)}/?error=oauth_failed&detail=${errDetail}`);
     }
 
     const octokit = new Octokit({ auth: tokenData.access_token });

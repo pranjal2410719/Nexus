@@ -1,7 +1,7 @@
 // Step 1 of GitHub OAuth — redirects the user to GitHub's authorize screen.
 // GET /api/auth/start
 import { randomUUID } from "node:crypto";
-import { getStoreHandle } from "@/lib/auth";
+import { getStoreHandle } from "@/lib/storage/blob-store";
 
 function siteOrigin(request: Request): string {
   return process.env.URL ?? process.env.NETLIFY_URL ?? new URL(request.url).origin;

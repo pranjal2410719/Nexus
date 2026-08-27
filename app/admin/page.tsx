@@ -1,18 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Loader } from "../components/loader";
-
-interface AdminUser {
-  githubLogin: string;
-  owner: string;
-  repo: string;
-  targetFile: string;
-  timezone: string;
-  slots: { time: string; count: number }[];
-  createdAt: string;
-  updatedAt: string;
-}
+import { Loader } from "@/components/ui/loader";
+import { UserTable } from "@/components/admin/user-table";
+import type { AdminUser } from "@/types/user";
 
 export default function AdminPage() {
   const [loading, setLoading] = useState(true);
@@ -47,15 +39,15 @@ export default function AdminPage() {
       {loading && <Loader label="Loading admin panel…" />}
 
       <nav className="navbar">
-        <a href="/" className="logo-mark" aria-label="Nexus home">
+        <Link href="/" className="logo-mark" aria-label="Nexus home">
           <div className="logo-sq">N</div>
           <span className="logo-text">Nexus</span>
-        </a>
+        </Link>
 
         <div className="nav-actions">
-          <a href="/" className="btn-nav-outline">
+          <Link href="/" className="btn-nav-outline">
             ← Back to Dashboard
-          </a>
+          </Link>
         </div>
       </nav>
 
@@ -72,36 +64,7 @@ export default function AdminPage() {
                 Read-only directory of everyone signed in. Tokens stay encrypted
                 at rest and are never exposed.
               </p>
-              {users.length === 0 ? (
-                <div className="matrix-empty">No users yet.</div>
-              ) : (
-                <div className="admin-table-wrap">
-                  <table className="admin-table">
-                    <thead>
-                      <tr>
-                        <th>User</th>
-                        <th>Repo</th>
-                        <th>Target file</th>
-                        <th>Timezone</th>
-                        <th>Slots</th>
-                        <th>Joined</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.map((u) => (
-                        <tr key={u.githubLogin}>
-                          <td>@{u.githubLogin}</td>
-                          <td>{u.repo ? `${u.owner}/${u.repo}` : "—"}</td>
-                          <td>{u.targetFile}</td>
-                          <td>{u.timezone}</td>
-                          <td>{u.slots.length}</td>
-                          <td>{new Date(u.createdAt).toLocaleDateString()}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+              <UserTable users={users} />
             </div>
           )}
         </section>
@@ -110,7 +73,7 @@ export default function AdminPage() {
       <footer>
         <span>Nexus — Open Source Commit Engine</span>
         <span>Admin panel · read-only</span>
-        <a href="/">Dashboard ↗</a>
+        <Link href="/">Dashboard ↗</Link>
       </footer>
     </div>
   );

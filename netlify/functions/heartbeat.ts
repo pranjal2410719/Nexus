@@ -10,10 +10,11 @@
 //
 // Isolation: the engine always runs with the user's own credentials; no shared
 // GitHub identity is ever used.
-import { makeBatchCommits } from "../../lib/commit-helper";
-import { getStoreHandle, type UserConfig } from "../../lib/auth";
-import { json } from "../../lib/http";
-import { decryptSecret } from "../../lib/security";
+import { makeBatchCommits } from "@/lib/core/commit-engine";
+import { getStoreHandle } from "@/lib/storage/blob-store";
+import { json } from "@/lib/http/response";
+import { decryptSecret } from "@/lib/security/encryption";
+import type { UserConfig, ScheduleSlot } from "@/types/user";
 
 export const config = { schedule: "*/15 * * * *" };
 
@@ -23,7 +24,10 @@ const BUDGET_MS = 12_000;
 const MAX_USERS_PER_TICK = 50;
 
 /** Returns the given date's wall-clock parts in the user's IANA timezone. */
-function zonedParts(date: Date, timeZone: string): { year: number; month: number; day: number; hour: number; minute: number } {
+export function zonedParts(
+  date: Date,
+  timeZone: string
+): { year: number; month: number; day: number; hour: number; minute: number } {
   const fmt = new Intl.DateTimeFormat("en-US", {
     timeZone,
     hour12: false,
@@ -34,7 +38,8 @@ function zonedParts(date: Date, timeZone: string): { year: number; month: number
     minute: "2-digit",
   });
   const parts = Object.fromEntries(
-    fmt.formatToParts(date)
+    fmt
+      .formatToParts(date)
       .filter((p) => p.type !== "literal")
       .map((p) => [p.type, p.value])
   );
@@ -47,28 +52,58 @@ function zonedParts(date: Date, timeZone: string): { year: number; month: number
   };
 }
 
-function zonedDayKey(date: Date, timeZone: string): string {
+export function zonedDayKey(date: Date, timeZone: string): string {
   const p = zonedParts(date, timeZone);
   return `${p.year}-${String(p.month).padStart(2, "0")}-${String(p.day).padStart(2, "0")}`;
 }
 
 /**
- * A slot "HH:MM" is due if the current minute is within ±15 minutes of it and
- * it hasn't already fired today. 15-min window guarantees the heartbeat tick
- * (every 15 min) always catches it exactly once thanks to the lastRun guard.
+ * Determines whether a slot is due.
+ * Checks candidate occurrences for today, yesterday, and tomorrow relative to now
+ * within ±15 minutes, returning the matched target date key if due, or null if not due.
  */
-function isSlotDue(slot: { time: string; lastRun: string | null }, now: Date, timeZone: string): boolean {
+export function getDueTargetDateKey(
+  slot: ScheduleSlot,
+  now: Date,
+  timeZone: string
+): string | null {
   const p = zonedParts(now, timeZone);
   const [hh, mm] = slot.time.split(":").map(Number);
   const slotMin = hh * 60 + mm;
   const nowMin = p.hour * 60 + p.minute;
 
-  const today = zonedDayKey(now, timeZone);
-  if (slot.lastRun === today) return false;
+  // 1. Check today's candidate
+  const todayKey = zonedDayKey(now, timeZone);
+  const diffToday = nowMin - slotMin;
+  if (Math.abs(diffToday) <= 15) {
+    return slot.lastRun === todayKey ? null : todayKey;
+  }
 
-  // Distance on a 24h clock — due within ±15 minutes.
-  const delta = ((nowMin - slotMin) % 1440 + 1440) % 1440;
-  return delta <= 15 || delta >= 1440 - 15;
+  // 2. Check tomorrow's candidate (now is near midnight 23:50, slot is next day 00:05)
+  const diffTomorrow = (nowMin - 1440) - slotMin;
+  if (Math.abs(diffTomorrow) <= 15) {
+    const tomorrowDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const tomorrowKey = zonedDayKey(tomorrowDate, timeZone);
+    return slot.lastRun === tomorrowKey ? null : tomorrowKey;
+  }
+
+  // 3. Check yesterday's candidate (now is near midnight 00:05, slot is previous day 23:55)
+  const diffYesterday = (nowMin + 1440) - slotMin;
+  if (Math.abs(diffYesterday) <= 15) {
+    const yesterdayDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const yesterdayKey = zonedDayKey(yesterdayDate, timeZone);
+    return slot.lastRun === yesterdayKey ? null : yesterdayKey;
+  }
+
+  return null;
+}
+
+export function isSlotDue(
+  slot: ScheduleSlot,
+  now: Date,
+  timeZone: string
+): boolean {
+  return getDueTargetDateKey(slot, now, timeZone) !== null;
 }
 
 export default async () => {
@@ -76,11 +111,15 @@ export default async () => {
   const store = getStoreHandle();
   const now = new Date();
 
-  const stats = { usersProcessed: 0, slotsFired: 0, commitsCommitted: 0, errors: [] as string[] };
+  const stats = {
+    usersProcessed: 0,
+    slotsFired: 0,
+    commitsCommitted: 0,
+    errors: [] as string[],
+  };
   let processed = 0;
 
   try {
-    // Blob store list() with paginate:true streams every user key.
     const pages = store.list({ prefix: "user:", paginate: true });
     for await (const page of pages) {
       for (const { key } of page.blobs) {
@@ -100,39 +139,52 @@ export default async () => {
           if (!user.encryptedToken || !user.repo) continue; // incomplete onboarding
 
           const timezone = user.timezone || "Asia/Kolkata";
-          const dayKey = zonedDayKey(now, timezone);
-          let changed = false;
+          let token: string | null = null;
 
           for (const slot of user.slots ?? []) {
-            if (!isSlotDue(slot, now, timezone)) continue;
+            const targetDateKey = getDueTargetDateKey(slot, now, timezone);
+            if (!targetDateKey) continue;
 
-            // WRITE-AHEAD: mark the slot as run BEFORE executing so a timeout
-            // mid-batch can never cause duplicate commits on the next tick.
-            // If nothing is committed we unmark it, so the slot retries later.
-            slot.lastRun = dayKey;
-            changed = true;
+            const previousLastRun = slot.lastRun;
+            // WRITE-AHEAD: mark and save the slot as run BEFORE executing commits
+            // so function timeouts or crashes never cause duplicate commit storms.
+            slot.lastRun = targetDateKey;
+            user.updatedAt = new Date().toISOString();
+            await store.set(key, JSON.stringify(user));
             stats.slotsFired++;
 
-            const token = await decryptSecret(user.encryptedToken);
-            const result = await makeBatchCommits(
-              { token, owner: user.owner, repo: user.repo, targetFile: user.targetFile },
-              slot.count,
-              `${slot.time} ${timezone}`
-            );
+            try {
+              if (!token) {
+                token = await decryptSecret(user.encryptedToken);
+              }
 
-            stats.commitsCommitted += result.committed;
-            if (result.committed === 0) {
-              slot.lastRun = null; // allow retry on a later tick
+              const result = await makeBatchCommits(
+                { token, owner: user.owner, repo: user.repo, targetFile: user.targetFile },
+                slot.count,
+                `${slot.time} ${timezone}`
+              );
+
+              stats.commitsCommitted += result.committed;
+              if (result.committed === 0) {
+                // If 0 commits succeeded, rollback lastRun so it can retry later
+                slot.lastRun = previousLastRun;
+                user.updatedAt = new Date().toISOString();
+                await store.set(key, JSON.stringify(user));
+              }
+              if (result.errors.length) {
+                stats.errors.push(...result.errors.map((e) => `${key}: ${e}`));
+              }
+            } catch (commitErr: any) {
+              // Rollback on unexpected commit error
+              slot.lastRun = previousLastRun;
+              user.updatedAt = new Date().toISOString();
+              await store.set(key, JSON.stringify(user));
+              stats.errors.push(`${key}: ${commitErr.message}`);
             }
-            if (result.errors.length) stats.errors.push(...result.errors.map((e) => `${key}: ${e}`));
 
             if (Date.now() - started > BUDGET_MS) break;
           }
 
-          if (changed) {
-            user.updatedAt = new Date().toISOString();
-            await store.set(key, JSON.stringify(user));
-          }
           processed++;
           stats.usersProcessed++;
         } catch (err: any) {

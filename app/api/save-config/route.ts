@@ -1,7 +1,10 @@
 // POST /api/save-config — validates and persists the user's
 // commit configuration (target repo, file, timezone, schedule slots).
-import { getUserByRequest, publicUser, saveUser, type ScheduleSlot } from "@/lib/auth";
-import { CORS_HEADERS, handleCors, json } from "@/lib/http";
+import { getUserByRequest, publicUser, saveUser } from "@/lib/auth/user";
+import { CORS_HEADERS, handleCors } from "@/lib/http/cors";
+import { json } from "@/lib/http/response";
+import { MAX_SLOTS } from "@/config/constants";
+import type { ScheduleSlot } from "@/types/user";
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 const NAME_RE = /^[A-Za-z0-9_.-]+$/;
@@ -37,19 +40,25 @@ export async function POST(request: Request) {
 
   const owner = String(body.owner ?? "").trim();
   const repo = String(body.repo ?? "").trim();
-  const targetFile = String(body.targetFile ?? "PROGRESS_LOG.md").trim().replace(/^\/+/, "");
+  const targetFile = String(body.targetFile ?? "PROGRESS_LOG.md")
+    .trim()
+    .replace(/\\/g, "/")
+    .replace(/^\.?\/+/, "");
   const timezone = String(body.timezone ?? user.timezone ?? "Asia/Kolkata");
 
   if (!NAME_RE.test(owner)) return json({ error: "Invalid owner name" }, 400);
   if (!NAME_RE.test(repo)) return json({ error: "Invalid repository name" }, 400);
-  if (!targetFile || targetFile.length > 200) return json({ error: "Invalid target file path" }, 400);
+  if (!targetFile || targetFile.length > 200 || targetFile.includes("..")) return json({ error: "Invalid target file path" }, 400);
   if (!isValidTimezone(timezone)) return json({ error: "Invalid timezone" }, 400);
 
-  // Slots: validate each { time: "HH:MM", count: 1..10 }.
+  // Slots: validate each { time: "HH:MM", count: 1..3 }.
   // Preserve lastRun for slots whose time is unchanged, so saving the config
   // never re-arms an already-fired slot (prevents same-day duplicate bursts).
   let slots: ScheduleSlot[] = [];
   if (Array.isArray(body.slots)) {
+    if (body.slots.length > MAX_SLOTS) {
+      return json({ error: `Maximum ${MAX_SLOTS} slots allowed` }, 400);
+    }
     const prevByTime = new Map<string, string | null>(
       (user.slots ?? []).map((s) => [s.time, s.lastRun])
     );

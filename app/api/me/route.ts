@@ -1,6 +1,7 @@
 // GET /api/me — returns the authenticated user's config (never the encrypted token).
-import { getUserByRequest, publicUser } from "@/lib/auth";
-import { CORS_HEADERS, handleCors, json } from "@/lib/http";
+import { getUserByRequest, publicUser } from "@/lib/auth/user";
+import { CORS_HEADERS, handleCors } from "@/lib/http/cors";
+import { json } from "@/lib/http/response";
 
 export async function GET(request: Request) {
   const cors = handleCors(request);

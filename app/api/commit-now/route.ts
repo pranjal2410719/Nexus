@@ -1,11 +1,12 @@
 // POST /api/commit-now — manual dispatch for the authenticated user.
 // Creates ONE commit to their own repo, capped per day.
-import { makeSingleCommit } from "@/lib/commit-helper";
-import { getStoreHandle, getUserByRequest } from "@/lib/auth";
-import { CORS_HEADERS, handleCors, json } from "@/lib/http";
-import { decryptSecret } from "@/lib/security";
-
-const DEFAULT_DAILY_CAP = 5;
+import { makeSingleCommit } from "@/lib/core/commit-engine";
+import { getStoreHandle } from "@/lib/storage/blob-store";
+import { getUserByRequest } from "@/lib/auth/user";
+import { CORS_HEADERS, handleCors } from "@/lib/http/cors";
+import { json } from "@/lib/http/response";
+import { decryptSecret } from "@/lib/security/encryption";
+import { DEFAULT_DAILY_CAP } from "@/config/constants";
 
 export async function POST(request: Request) {
   const cors = handleCors(request);

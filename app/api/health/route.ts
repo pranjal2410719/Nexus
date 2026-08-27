@@ -2,8 +2,9 @@
 // Reports which store mode is active, which env vars are configured, and does a
 // write/read/delete round-trip through the store. Never leaks secret values —
 // env vars are reported as presence flags only.
-import { getStoreHandle, getStoreMode, type StoreMode } from "@/lib/auth";
-import { CORS_HEADERS, json } from "@/lib/http";
+import { getStoreHandle, getStoreMode, type StoreMode } from "@/lib/storage/blob-store";
+import { CORS_HEADERS, handleCors } from "@/lib/http/cors";
+import { json } from "@/lib/http/response";
 
 function envFlag(name: string): "configured" | "missing" {
   return process.env[name] ? "configured" : "missing";
