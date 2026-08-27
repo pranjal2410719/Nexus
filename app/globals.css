@@ -49,7 +49,7 @@ body {
   position: fixed; inset: 0; z-index: 1000;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 24px;
-  background: var(--color-cream-paper);
+.loader-built-by {\n  position: absolute;\n  left: 16px;\n  bottom: 16px;\n  font-size: 12px;\n  color: var(--color-forest-ink);\n  opacity: 0.6;\n  text-decoration: none;\n}\n
 }
 .loader-cube {
   width: 70.4px; height: 70.4px;

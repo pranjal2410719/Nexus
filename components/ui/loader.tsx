@@ -22,6 +22,7 @@ export function Loader({ label = "Loading…" }: { label?: string }) {
         <div />
       </div>
       <span className="loader-label">{label}</span>
+      <a href="https://github.com/TheDev" className="loader-built-by" target="_blank" rel="noopener noreferrer">build by The Dev</a>
     </div>
   );
 }
