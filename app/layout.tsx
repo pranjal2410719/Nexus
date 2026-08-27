@@ -30,7 +30,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+        <body>{children}
+  <a href="mailto:2k24.cs1l.2410719@gmail.com" className="fab-bug" aria-label="Report a Bug">🐞</a>
+</body>
     </html>
   );
 }
