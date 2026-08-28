@@ -20,3 +20,37 @@ Acceptance Criteria:
 - Documentation: DEVELOPER_GUIDE.md (or updated README.md) is produced reflecting the new directory structure and developer instructions.
 
 Please initialize your BRIEFING.md and progress.md in your working directory, decompose the task, dispatch specialist subagents as needed, monitor progress, and notify me when complete.
+
+## 2026-08-28T05:13:36Z
+
+# Teamwork Project Prompt — Draft
+
+> Status: Step 9 — Ready for launch
+> Goal: Perform a UI audit of the slide‑out bug‑report panel and fix identified issues
+> Requested team: [none — teamwork routes from the description]
+
+Perform a comprehensive UI audit of the Nexus app’s slide‑out bug‑report panel, identify any layout, responsiveness, accessibility, or parameter conflicts, and fix the issues so the panel works correctly on both desktop and mobile devices.
+
+Working directory: ~/teamwork_projects/nexus_ui_audit
+
+## Requirements
+
+### R1. Responsive behavior
+The panel must display correctly on screen widths from 320 px up to 1920 px. The tab must remain visible when the panel is closed, and the panel must not overlap critical UI elements.
+
+### R2. Accessibility compliance
+All ARIA labels, keyboard navigation (Enter/Space/Escape), and focus management must function correctly and pass an automated axe‑core audit with zero violations.
+
+### R3. Design‑system consistency
+Colors, spacing, typography, and other visual styles must match the SayBriefly design system variables already used in the app.
+
+### R4. State persistence (optional but preferred)
+When a user navigates to another page within the app, the panel should retain its open/closed state.
+
+## Acceptance Criteria
+
+- Visual verification across breakpoints (320 px, 768 px, 1024 px, 1920 px) shows the panel layout as intended and the tab is always visible when closed.
+- Running `axe-core` (or equivalent) on the panel yields **zero** accessibility violations.
+- Opening and closing the panel triggers no console errors and animates smoothly.
+- (Optional) After navigating to a different route, the panel retains its previous open/closed state.
+

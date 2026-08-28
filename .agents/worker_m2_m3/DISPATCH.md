@@ -1,53 +1,45 @@
-## 2026-08-27T17:03:00Z
-You are Worker M2-M3 (Codebase Audit, Bug Fixes, Dead Code Cleanup & Directory Restructuring Specialist).
-Your working directory is: /home/dev/Desktop/khurafati/Nexus/.agents/worker_m2_m3
-Original user request is at: /home/dev/Desktop/khurafati/Nexus/.agents/ORIGINAL_REQUEST.md
-Project plan is at: /home/dev/Desktop/khurafati/Nexus/PROJECT.md
-Audit survey report is at: /home/dev/Desktop/khurafati/Nexus/.agents/explorer_survey_2/survey_audit.md
-Restructuring blueprint is at: /home/dev/Desktop/khurafati/Nexus/.agents/spec_miner_survey_3/survey_structure.md
+## 2026-08-28T11:03:28Z
+
+You are teamwork_preview_worker_m2_m3, working directory: /home/dev/Desktop/khurafati/Nexus/.agents/worker_m2_m3
+Project Root: /home/dev/Desktop/khurafati/Nexus
+Authoritative Request: /home/dev/Desktop/khurafati/Nexus/.agents/ORIGINAL_REQUEST.md
+Project Scope: /home/dev/Desktop/khurafati/Nexus/PROJECT.md
+Survey 3 Accessibility Analysis: /home/dev/Desktop/khurafati/Nexus/.agents/explorer_survey_3/analysis.md
+Spec Miner Survey 1 Analysis: /home/dev/Desktop/khurafati/Nexus/.agents/spec_miner_survey_1/analysis.md
 
 MANDATORY INTEGRITY WARNING:
 DO NOT CHEAT. All implementations must be genuine. DO NOT hardcode test results, create dummy/facade implementations, or circumvent the intended task. A teamwork_preview_auditor will independently verify your work. Integrity violations WILL be detected and your work WILL be rejected.
 
-Your mission:
-Implement Requirement R2 (Codebase Audit and Cleanup) and Requirement R3 (Directory Restructuring) across the Nexus codebase.
+EXCLUSIVE WRITE OWNERSHIP:
+You exclusively own: `/home/dev/Desktop/khurafati/Nexus/components/dashboard/bug-report-panel.tsx` and any minor accessibility styling in `/home/dev/Desktop/khurafati/Nexus/app/globals.css`.
 
-Tasks:
-1. Fix all identified audit bugs (from survey_audit.md):
-   - `netlify/functions/heartbeat.ts`:
-     * Fix midnight clock wraparound in `isSlotDue` (`delta >= 1440 - 15` issue).
-     * Fix write-ahead marker crash safety: write the updated `slot.lastRun` / state marker to the blob store before executing the commits so that a function timeout doesn't cause repeat commit storms.
-     * Ensure proper time budget check and clean error handling.
-   - `lib/auth/cookies.ts` (or `lib/auth.ts`):
-     * Wrap `decodeURIComponent` in a try/catch block inside `parseCookies` so malformed cookies never crash with an unhandled URIError.
-   - Frontend UI fixes:
-     * `app/status/page.tsx`: Fix empty mobile hamburger `onClick={() => {}}` by hooking up a working mobile navigation drawer; fix manual cap display to accurately reflect the configured cap (default 5).
-     * `app/page.tsx`: Fix repository dropdown state when user has 0 repositories (prevent infinite loading spinner); ensure daily limit counter synchronizes with server-side count.
-2. Restructure the codebase into the target clean modular layout (from survey_structure.md and PROJECT.md):
-   - Create `types/`: `user.ts`, `commit.ts`, `github.ts`, `health.ts`, `auth.ts`, `index.ts`.
-   - Create `config/`: `constants.ts`, `site.ts`.
-   - Modularize `lib/`:
-     * `lib/core/`: `commit-engine.ts` (keeping the verified R1 fix), `log-pruner.ts`, `task-generator.ts`
-     * `lib/auth/`: `user.ts`, `session.ts`, `cookies.ts`, `permissions.ts`
-     * `lib/storage/`: `blob-store.ts`, `local-file-store.ts`
-     * `lib/security/`: `encryption.ts`
-     * `lib/github/`: `client.ts`, `repo-service.ts`
-     * `lib/http/`: `cors.ts`, `response.ts`
-   - Modularize presentation components:
-     * `components/ui/`: `loader.tsx`, `menu-select.tsx`, `icons.tsx`
-     * `components/dashboard/`: `navbar.tsx`, `mobile-nav.tsx`, `hero-banner.tsx`, `config-form.tsx`, `dispatch-console.tsx`, `schedule-matrix.tsx`, `feature-cards.tsx`
-     * `components/status/`: `health-card.tsx`, `status-grid.tsx`
-     * `components/admin/`: `user-table.tsx`
-   - Update `app/page.tsx`, `app/status/page.tsx`, `app/admin/page.tsx` to be lean page containers using the modular components.
-   - Update all `app/api/**/route.ts` handlers and `netlify/functions/heartbeat.ts` to import from `@/lib/*`, `@/types`, and `@/config/*`.
-   - Update `tsconfig.json` path mappings.
-   - Delete obsolete `app/components/` and legacy root `lib/*.ts` once migration is complete.
-3. Eliminate dead code:
-   - Remove unused imports, redundant type declarations, dead functions, orphan files.
-4. Run all verification commands:
-   - `node test_file_update.js`
-   - `node --experimental-strip-types --import ./tests/ts_resolver.js ./tests/run_all.js`
-   - `npx tsc --noEmit`
-   - `npm run build`
-5. Write your handoff report to `/home/dev/Desktop/khurafati/Nexus/.agents/worker_m2_m3/handoff.md`.
-6. Send a message to the orchestrator when finished.
+TASK: Implement Milestones 2 & 3 (Accessibility Compliance, Focus Management, Design System & State Persistence).
+1. Read the survey analysis reports.
+2. In `components/dashboard/bug-report-panel.tsx`:
+   - Implement `BugReportPanelProps`:
+     ```typescript
+     export interface BugReportPanelProps {
+       initialOpen?: boolean;
+       recipientEmail?: string;
+       storageKey?: string;
+       onOpenChange?: (open: boolean) => void;
+     }
+     ```
+   - State Persistence (Requirement R4): SSR-safe `localStorage` synchronization using `storageKey ?? "nexus_bug_panel_open"` with try/catch guard, ensuring client-side route transitions and reloads preserve open/closed state.
+   - ARIA & Accessibility (Requirement R2):
+     * Trigger tab `.slideOutTab`: `role="button"`, `tabIndex={0}`, `aria-expanded={open}`, `aria-controls="slideOut-modal"`, `aria-label={open ? "Close bug report panel" : "Open bug report panel"}`, Enter and Space key handler.
+     * Container & Modal: Separate trigger tab from the modal dialog. On `#slideOut-modal`, set `role="dialog"`, `aria-modal="true"`, `aria-labelledby="bugReportTitle"`, `aria-hidden={!open}`. When closed, ensure interior interactive elements cannot receive focus (using `tabIndex={open ? 0 : -1}` / `inert={!open}`).
+     * Initial Focus: When opened, automatically shift focus to the close button (`.modal-close`) or first form control.
+     * Focus Trapping: When opened, intercept `Tab` and `Shift+Tab` to trap focus cyclically within the modal's focusable elements (`.modal-close`, `select#bug-type`, `select#bug-severity`, `input#bug-title`, `textarea#bug-description`, `input#bug-email`, `.bug-submit-btn`), preventing focus from leaking to background page elements.
+     * Focus Restoration: When closed (via Escape key, close button, or backdrop click), restore focus to `.slideOutTab`.
+     * Form Semantics: Connect submit button to the `<form id="bug-report-form">` (or place inside the form), and add `role="status"` / `role="alert"` with `aria-live="polite"` to the status/error message container.
+   - Design System (Requirement R3):
+     * Use SayBriefly CSS tokens (`var(--color-terracotta)`, `var(--color-forest-ink)`, `var(--color-cream-paper)`, `var(--color-pencil-gray)`, `var(--color-whisper-gray)`).
+     * Ensure focus rings have high contrast (`outline: 2px solid var(--color-forest-ink); outline-offset: 2px;`).
+     * Ensure all text elements meet WCAG AA >= 4.5:1 contrast.
+3. Run verification:
+   - `npm run typecheck`
+   - `npm test`
+   - `npm run test:all`
+4. Document all changes and verification outputs in `/home/dev/Desktop/khurafati/Nexus/.agents/worker_m2_m3/handoff.md`.
+5. Send completion message via send_message.

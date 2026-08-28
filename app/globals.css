@@ -1,4 +1,4 @@
-F*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
   /* Colors */
@@ -10,7 +10,8 @@ F*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   --color-sticky-note-teal: #a8e5e5;
   --color-sticky-note-mint: #d5f5c2;
   --color-sticky-note-blush: #f6d0ff;
-  --color-terracotta: #cb5521;
+  --color-terracotta: #b04a1c;
+  --color-terracotta-hover: #963e17;
 
   /* Typography */
   --font-bricolage-grotesque: 'Bricolage Grotesque', ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -502,18 +503,23 @@ footer a { color: var(--color-forest-ink); text-decoration: underline; }
   .panel { padding: 20px; }
   .dash-head { flex-direction: column; }
   footer { flex-direction: column; align-items: flex-start; gap: 12px; }
-}    @media (max-width: 420px) { .matrix-grid { grid-template-columns: 1fr; } .health-grid { grid-template-columns: 1fr; } }
+}
+
+@media (max-width: 420px) {
+  .matrix-grid { grid-template-columns: 1fr; }
+  .health-grid { grid-template-columns: 1fr; }
+}
 
 /* ===== Slide-out Bug Report Panel ===== */
 #slideOut {
   position: fixed;
+  top: 140px;
   width: 340px;
   max-width: 90vw;
+  max-height: calc(100vh - 160px);
   right: -296px;
   z-index: 200;
-  transition-property: right;
-  transition-duration: 0.5s;
-  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+  transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: row;
   pointer-events: none;
@@ -547,39 +553,12 @@ footer a { color: var(--color-forest-ink); text-decoration: underline; }
 }
 
 .slideOutTab:hover {
-  background: #b04a1c;
+  background: var(--color-terracotta-hover, #963e17);
 }
 
-/* Responsive adjustments */
-@media (max-width: 420px) {
-  #slideOut {
-    width: 100%;
-    max-width: 100vw;
-    right: -40px;
-    top: 0;
-    border-radius: 0;
-    flex-direction: column;
-  }
-  .showSlideOut {
-    right: 0 !important;
-  }
-  .slideOutTab {
-    width: 100%;
-    height: 40px;
-    border-radius: 0;
-    padding-top: 0;
-    justify-content: center;
-    align-items: center;
-  }
-  .slideOutTab-inner {
-    flex-direction: row;
-    gap: 8px;
-  }
-  .slideOut-modal {
-    border-radius: 0;
-    height: calc(100vh - 40px);
-    max-height: none;
-  }
+.slideOutTab:focus-visible {
+  outline: 2px solid var(--color-forest-ink);
+  outline-offset: 2px;
 }
 
 .slideOutTab-inner {
@@ -644,6 +623,7 @@ footer a { color: var(--color-forest-ink); text-decoration: underline; }
   justify-content: space-between;
   padding: 20px 20px 12px;
   border-bottom: 1px solid var(--color-pencil-gray);
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -679,12 +659,20 @@ footer a { color: var(--color-forest-ink); text-decoration: underline; }
   border-color: var(--color-forest-ink);
 }
 
+.modal-close:focus-visible {
+  outline: 2px solid var(--color-forest-ink);
+  outline-offset: 2px;
+  border-color: var(--color-forest-ink);
+}
+
 .modal-body {
   position: relative;
   z-index: 1;
   padding: 16px 20px;
   overflow-y: auto;
   max-height: 60vh;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .modal-intro {
@@ -728,8 +716,8 @@ footer a { color: var(--color-forest-ink); text-decoration: underline; }
 .bug-form-group input:focus,
 .bug-form-group textarea:focus,
 .bug-form-group select:focus {
-  outline: 2px solid var(--color-highlighter-yellow);
-  outline-offset: 1px;
+  outline: 2px solid var(--color-forest-ink);
+  outline-offset: 2px;
   border-color: var(--color-forest-ink);
 }
 
@@ -770,13 +758,14 @@ footer a { color: var(--color-forest-ink); text-decoration: underline; }
   justify-content: space-between;
   gap: 10px;
   background: var(--color-whisper-gray);
+  flex-shrink: 0;
 }
 
 .modal-footer .bug-form-note {
   font-family: var(--font-roboto-mono);
   font-size: 10px;
   color: var(--color-forest-ink);
-  opacity: 0.65;
+  opacity: 0.85;
   line-height: 1.4;
 }
 
@@ -800,6 +789,11 @@ footer a { color: var(--color-forest-ink); text-decoration: underline; }
 .bug-submit-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: var(--shadow-subtle-2);
+}
+
+.bug-submit-btn:focus-visible {
+  outline: 2px solid var(--color-forest-ink);
+  outline-offset: 2px;
 }
 
 .bug-submit-btn:disabled {
@@ -827,8 +821,8 @@ footer a { color: var(--color-forest-ink); text-decoration: underline; }
 .bug-submit-status.err {
   display: block;
   color: var(--color-terracotta);
-  background: rgba(203, 85, 33, 0.1);
-  border: 1px solid rgba(203, 85, 33, 0.3);
+  background: rgba(176, 74, 28, 0.1);
+  border: 1px solid rgba(176, 74, 28, 0.3);
 }
 
 .bug-backdrop {
@@ -848,12 +842,21 @@ footer a { color: var(--color-forest-ink); text-decoration: underline; }
   pointer-events: auto;
 }
 
+/* ===== Responsive adjustments for Slide-Out Panel ===== */
 @media (max-width: 768px) {
   #slideOut {
-    width: 280px;
-    right: -236px;
     top: 70px;
-    max-height: 75vh;
+    width: 300px;
+    max-width: calc(100vw - 20px);
+    right: -256px;
+    max-height: calc(100vh - 90px);
+  }
+  .slideOut-modal {
+    width: 256px;
+  }
+  .slideOutTab {
+    width: 44px;
+    padding-top: 20px;
   }
   .slideOutTab-inner .bug-label {
     font-size: 10px;
@@ -865,9 +868,48 @@ footer a { color: var(--color-forest-ink); text-decoration: underline; }
 
 @media (max-width: 420px) {
   #slideOut {
-    width: calc(100vw - 24px);
-    right: calc(-100vw + 0px);
     top: 60px;
+    width: calc(100vw - 20px);
+    right: calc(-100vw + 64px);
+    max-height: calc(100vh - 80px);
+  }
+  .slideOutTab {
+    width: 44px;
+    padding-top: 16px;
+    border-radius: 8px 0 0 8px;
+  }
+  .slideOutTab-inner .bug-label {
+    font-size: 9px;
+    letter-spacing: 0.5px;
+  }
+  .slideOut-modal {
+    width: calc(100% - 44px);
+    max-height: calc(100vh - 80px);
+    border-radius: 8px 0 0 8px;
+  }
+  .modal-header {
+    padding: 14px 16px 10px;
+  }
+  .modal-title {
+    font-size: 16px;
+  }
+  .modal-body {
+    padding: 12px 16px;
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+  }
+  .modal-footer {
+    padding: 10px 16px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .modal-footer .bug-form-note {
+    text-align: center;
+  }
+  .bug-submit-btn {
+    justify-content: center;
+    width: 100%;
   }
   .bug-form-row {
     flex-direction: column;
