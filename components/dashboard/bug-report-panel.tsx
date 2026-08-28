@@ -177,10 +177,7 @@ export function BugReportPanel() {
             }
           }}
         >
-          <div className="slideOutTab-inner">
-            <span className="bug-icon" aria-hidden="true">🐞</span>
-            <span className="bug-label">Report Bug</span>
-          </div>
+          <div className="slideOutTab-inner"><span className="bug-label">Report Bug</span></div>
         </div>
         <div className="slideOut-modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
