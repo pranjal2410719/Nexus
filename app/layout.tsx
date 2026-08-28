@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BugReportPanel } from "@/components/dashboard/bug-report-panel";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -31,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
         <body>{children}
-  <a href="mailto:2k24.cs1l.2410719@gmail.com" className="fab-bug" aria-label="Report a Bug">🐞</a>
+      <BugReportPanel />
 </body>
     </html>
   );
