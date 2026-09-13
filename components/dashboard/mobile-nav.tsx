@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
+import { openBugReportModal } from "@/components/dashboard/bug-report-modal";
 import type { PublicUser } from "@/types/user";
 
 interface MobileNavProps {
@@ -18,6 +20,15 @@ export function MobileNav({
   sourceUrl = siteConfig.sourceUrl,
 }: MobileNavProps) {
   const loggedIn = !!user;
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
 
   return (
     <div
@@ -72,6 +83,16 @@ export function MobileNav({
           <Link href="/status" className="nav-link" onClick={onClose}>
             Status
           </Link>
+          <button
+            type="button"
+            className="nav-link btn-nav-link text-left"
+            onClick={() => {
+              onClose();
+              openBugReportModal();
+            }}
+          >
+            Report Bug
+          </button>
           <a
             href={sourceUrl}
             target="_blank"

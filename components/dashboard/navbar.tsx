@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
+import { openBugReportModal } from "@/components/dashboard/bug-report-modal";
 import type { PublicUser } from "@/types/user";
 
 interface NavbarProps {
@@ -36,6 +37,14 @@ export function Navbar({
         <Link href="/status" className="nav-link">
           Status
         </Link>
+        <button
+          type="button"
+          className="nav-link btn-nav-link"
+          onClick={() => openBugReportModal()}
+          aria-label="Report an issue or bug"
+        >
+          Report Bug
+        </button>
         <a
           href={sourceUrl}
           target="_blank"

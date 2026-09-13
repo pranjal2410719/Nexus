@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HealthCard } from "@/components/status/health-card";
 import { MobileNav } from "@/components/dashboard/mobile-nav";
+import { openBugReportModal } from "@/components/dashboard/bug-report-modal";
 import { siteConfig } from "@/config/site";
 import type { HealthReport } from "@/types/health";
 import type { PublicUser } from "@/types/user";
@@ -76,6 +77,14 @@ export default function StatusPage() {
           <Link href="/status" className="nav-link">
             Status
           </Link>
+          <button
+            type="button"
+            className="nav-link btn-nav-link"
+            onClick={() => openBugReportModal()}
+            aria-label="Report an issue or bug"
+          >
+            Report Bug
+          </button>
           <a
             href={siteConfig.sourceUrl}
             target="_blank"
