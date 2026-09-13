@@ -67,9 +67,16 @@ export function Navbar({
                 Admin
               </Link>
             )}
-            <a href="/api/auth/logout" className="btn-nav-outline">
+            <button
+              type="button"
+              className="btn-nav-outline"
+              onClick={async () => {
+                await fetch("/api/auth/logout", { method: "POST" });
+                window.location.href = "/";
+              }}
+            >
               Log out
-            </a>
+            </button>
             <a href="#configSection" className="btn-nav-filled">
               → Dashboard
             </a>

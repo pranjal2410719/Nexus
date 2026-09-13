@@ -129,13 +129,17 @@ export function MobileNav({
                   Admin Panel
                 </Link>
               )}
-              <a
-                href="/api/auth/logout"
+              <button
+                type="button"
                 className="btn-nav-outline"
                 style={{ textAlign: "center" }}
+                onClick={async () => {
+                  await fetch("/api/auth/logout", { method: "POST" });
+                  onClose();
+                }}
               >
                 Log out
-              </a>
+              </button>
               <a
                 href="#configSection"
                 className="btn-nav-filled"

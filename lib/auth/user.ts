@@ -4,6 +4,7 @@ import { getStoreHandle } from "@/lib/storage/blob-store";
 import { parseCookies } from "./cookies";
 import { isAdmin } from "./permissions";
 import type { SessionData } from "./session";
+import { isSessionExpired } from "./session";
 
 export async function getUserById(githubId: string): Promise<UserConfig | null> {
   const raw = await getStoreHandle().get(`user:${githubId}`, { type: "text" });
@@ -35,6 +36,11 @@ export async function getUserByRequest(request: Request): Promise<UserConfig | n
   try {
     session = JSON.parse(raw) as SessionData;
   } catch {
+    return null;
+  }
+  // Reject expired sessions
+  if (isSessionExpired(session)) {
+    await getStoreHandle().delete(`session:${sessionId}`).catch(() => undefined);
     return null;
   }
   return getUserById(session.userId);

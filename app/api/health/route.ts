@@ -34,19 +34,21 @@ export async function GET() {
     }
   }
 
-  const manualDailyCap = process.env.MANUAL_DAILY_CAP;
+  // Presence flags only — never expose raw env values
   const env = {
     GITHUB_CLIENT_ID: envFlag("GITHUB_CLIENT_ID"),
     GITHUB_CLIENT_SECRET: envFlag("GITHUB_CLIENT_SECRET"),
     BLOBS_MASTER_KEY: envFlag("BLOBS_MASTER_KEY"),
-    MANUAL_DAILY_CAP: manualDailyCap ? manualDailyCap : envFlag("MANUAL_DAILY_CAP"),
+    MANUAL_DAILY_CAP: envFlag("MANUAL_DAILY_CAP"),
   };
 
+  // Health requires all required env vars AND a successful store roundtrip
   const ok =
     env.GITHUB_CLIENT_ID === "configured" &&
     env.GITHUB_CLIENT_SECRET === "configured" &&
     env.BLOBS_MASTER_KEY === "configured" &&
-    store.roundtrip !== "error";
+    store.mode !== "unconfigured" &&
+    store.roundtrip === "ok";
 
   return json(
     {

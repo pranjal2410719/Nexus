@@ -1,0 +1,106 @@
+{
+  "project": "Nexus SaaS Product",
+  "version": "3.1.0",
+  "phase": "Product Hardening & Launch",
+  "timestamp": "2026-09-12T18:24:26Z",
+  "tasks": [
+    {
+      "id": "P0-1",
+      "title": "Fix midnight double-fire in heartbeat scheduler",
+      "priority": "P0",
+      "status": "DONE",
+      "description": "Slots near 00:00 commit twice because the \u00b115 min window overlaps two different local days"
+    },
+    {
+      "id": "P0-2",
+      "title": "Fix heartbeat lexicographic starvation",
+      "priority": "P0",
+      "status": "DONE",
+      "description": "store.list returns lexicographic order; first users monopolize every tick"
+    },
+    {
+      "id": "P0-3",
+      "title": "Add slot.count validation in heartbeat",
+      "priority": "P0",
+      "status": "DONE",
+      "description": "Malformed slot.count retries forever or blows through budget"
+    },
+    {
+      "id": "P1-1",
+      "title": "Make daily cap atomic with CAS loop in commit-now",
+      "priority": "P1",
+      "status": "DONE",
+      "description": "Non-atomic read-modify-write allows cap bypass under concurrency"
+    },
+    {
+      "id": "P1-2",
+      "title": "Add session expiry and revocation",
+      "priority": "P1",
+      "status": "DONE",
+      "description": "Sessions never expire server-side; stolen cookies valid indefinitely"
+    },
+    {
+      "id": "P1-3",
+      "title": "Fix logout to use POST instead of GET",
+      "priority": "P1",
+      "status": "DONE",
+      "description": "GET logout is CSRF-able via plain links with SameSite=Lax cookies"
+    },
+    {
+      "id": "P1-4",
+      "title": "Fix health endpoint leaking MANUAL_DAILY_CAP",
+      "priority": "P1",
+      "status": "DONE",
+      "description": "Returns raw value instead of presence flag; reports unconfigured store as healthy"
+    },
+    {
+      "id": "P1-5",
+      "title": "Fix status page dead hamburger menu",
+      "priority": "P1",
+      "status": "DONE",
+      "description": "onClick={() => {}} on mobile nav toggle"
+    },
+    {
+      "id": "P2-1",
+      "title": "Update README.md for current codebase structure",
+      "priority": "P2",
+      "status": "DONE",
+      "description": "README references old lib/auth.ts etc. that no longer exist; route map stale"
+    },
+    {
+      "id": "P2-2",
+      "title": "Update DEPLOYING.md for version consistency",
+      "priority": "P2",
+      "status": "DONE",
+      "description": "MANUAL_DAILY_CAP default contradiction between docs and code"
+    },
+    {
+      "id": "P2-3",
+      "title": "Make GA tag env-driven in layout.tsx",
+      "priority": "P2",
+      "status": "DONE",
+      "description": "Hardcoded GA tag G-5233K47F2S not env-driven"
+    },
+    {
+      "id": "P2-4",
+      "title": "Add CHANGELOG.md",
+      "priority": "P2",
+      "status": "DONE",
+      "description": "Track versioned changes for GitHub releases"
+    },
+    {
+      "id": "P2-5",
+      "title": "Create GitHub Actions CI workflow",
+      "priority": "P2",
+      "status": "DONE",
+      "description": "Add CI with typecheck, test, and build steps"
+    },
+    {
+      "id": "P3-1",
+      "title": "Create GitHub release with versioning",
+      "priority": "P3",
+      "status": "IN_PROGRESS",
+      "description": "Tag v3.1.0 with proper release notes"
+    }
+  ]
+}

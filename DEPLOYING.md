@@ -84,7 +84,7 @@ In the Netlify dashboard, go to your site → **Site configuration → Environme
 | `GITHUB_CLIENT_ID` | Client ID from §2.3 | ✅ Yes |
 | `GITHUB_CLIENT_SECRET` | Client secret from §2.3 | ✅ Yes |
 | `BLOBS_MASTER_KEY` | The 64-char hex string from §3.1 | ✅ Yes |
-| `MANUAL_DAILY_CAP` | e.g. `50` — manual-dispatch cap per user/day | Optional (default `50`) |
+| `MANUAL_DAILY_CAP` | e.g. `5` — manual-dispatch cap per user/day | Optional (default `5`) |
 
 Add each one as **"Single value"** (not a file). **Do not** set a `GITHUB_TOKEN` — there is no shared token anymore; every user brings their own.
 
@@ -128,7 +128,7 @@ npx netlify init
 npx netlify env:set GITHUB_CLIENT_ID your_client_id
 npx netlify env:set GITHUB_CLIENT_SECRET your_client_secret
 npx netlify env:set BLOBS_MASTER_KEY your_64_char_hex_key
-# (optional) npx netlify env:set MANUAL_DAILY_CAP 50
+# (optional) npx netlify env:set MANUAL_DAILY_CAP 5
 
 # 5. Deploy a preview, then promote to production
 npx netlify deploy --build          # preview URL

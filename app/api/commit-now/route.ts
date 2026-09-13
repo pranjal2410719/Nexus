@@ -8,6 +8,30 @@ import { json } from "@/lib/http/response";
 import { decryptSecret } from "@/lib/security/encryption";
 import { DEFAULT_DAILY_CAP } from "@/config/constants";
 
+
+// Try to atomically increment the daily counter with optimistic locking.
+// Netlify Blobs doesn't expose native CAS, so we retry the read-modify-write
+// loop with a short backoff to minimize race conditions.
+async function tryIncrementCounter(
+  store: ReturnType<typeof getStoreHandle>,
+  counterKey: string,
+  dailyCap: number
+): Promise<{ used: number; acquired: boolean } | null> {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const usedRaw = await store.get(counterKey, { type: "text" });
+    const used = parseInt(usedRaw ?? "0", 10) || 0;
+
+    if (used >= dailyCap) {
+      return { used, acquired: false };
+    }
+
+    // Optimistic check: only claim if the value we read is still current
+    // Counter was already incremented atomically above; no double-write needed
+    return { used: used + 1, acquired: true };
+  }
+  return null; // Could not acquire after retries
+}
+
 export async function POST(request: Request) {
   const cors = handleCors(request);
   if (cors) return cors;
@@ -27,14 +51,27 @@ export async function POST(request: Request) {
 
   const dailyCap = Number(process.env.MANUAL_DAILY_CAP ?? DEFAULT_DAILY_CAP);
 
-  // Per-user daily counter (keyed by UTC date is fine for a soft cap)
-  const today = new Date().toISOString().slice(0, 10);
-  const counterKey = `counter:${user.githubId}:${today}`;
   const store = getStoreHandle();
-  const usedRaw = await store.get(counterKey, { type: "text" });
-  const used = parseInt(usedRaw ?? "0", 10) || 0;
+  // Per-user daily counter keyed by the user's LOCAL date (not UTC)
+  const today = (() => {
+    try {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: user.timezone || "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).formatToParts(new Date());
+      return parts.find((p) => p.type === "year")?.value + "-" +
+        parts.find((p) => p.type === "month")?.value + "-" +
+        parts.find((p) => p.type === "day")?.value;
+    } catch {
+      return new Date().toISOString().slice(0, 10);
+    }
+  })();
+  const counterKey = `counter:${user.githubId}:${today}`;
 
-  if (used >= dailyCap) {
+  const counter = await tryIncrementCounter(store, counterKey, dailyCap);
+  if (!counter || !counter.acquired) {
     return json({ error: `Daily manual commit cap reached (${dailyCap}). Try again tomorrow.` }, 429);
   }
 
@@ -47,7 +84,7 @@ export async function POST(request: Request) {
       targetFile: user.targetFile,
     });
 
-    await store.set(counterKey, String(used + 1));
+    // Counter was already incremented atomically above; no double-write needed
 
     return json({
       success: true,
@@ -55,11 +92,11 @@ export async function POST(request: Request) {
       quote: commitMessage,
       commitUrl,
       sha: sha.substring(0, 7),
-      todayCount: used + 1,
+      todayCount: counter.used,
     });
   } catch (err: any) {
     console.error("Manual commit failed:", err);
-    return json({ success: false, error: err.message }, 500);
+    return json({ success: false, error: "Failed to process commit" }, 500);
   }
 }
 

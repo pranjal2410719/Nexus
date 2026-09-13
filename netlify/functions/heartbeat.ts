@@ -2,7 +2,7 @@
 //
 // Netlify scheduled functions are STATIC (defined at deploy time), so we cannot
 // create per-user crons. Instead this single function:
-//   1. Lists all user records from the Blob store
+//   1. Lists all user records from the Blob store (numerically sorted)
 //   2. For each user, checks which schedule slots are due in the current
 //      15-minute window (in the user's own timezone)
 //   3. Fires those slots with the user's OWN encrypted token
@@ -59,51 +59,27 @@ export function zonedDayKey(date: Date, timeZone: string): string {
 
 /**
  * Determines whether a slot is due.
- * Checks candidate occurrences for today, yesterday, and tomorrow relative to now
- * within ±15 minutes, returning the matched target date key if due, or null if not due.
+ * Checks only today's candidate within ±15 minutes, relying on lastRun
+ * to prevent duplicate firings across midnight boundaries.
+ * This eliminates the midnight double-fire bug from the previous ±15
+ * circular-clock implementation.
  */
-export function getDueTargetDateKey(
-  slot: ScheduleSlot,
-  now: Date,
-  timeZone: string
-): string | null {
-  const p = zonedParts(now, timeZone);
-  const [hh, mm] = slot.time.split(":").map(Number);
-  const slotMin = hh * 60 + mm;
-  const nowMin = p.hour * 60 + p.minute;
-
-  // 1. Check today's candidate
-  const todayKey = zonedDayKey(now, timeZone);
-  const diffToday = nowMin - slotMin;
-  if (Math.abs(diffToday) <= 15) {
-    return slot.lastRun === todayKey ? null : todayKey;
-  }
-
-  // 2. Check tomorrow's candidate (now is near midnight 23:50, slot is next day 00:05)
-  const diffTomorrow = (nowMin - 1440) - slotMin;
-  if (Math.abs(diffTomorrow) <= 15) {
-    const tomorrowDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-    const tomorrowKey = zonedDayKey(tomorrowDate, timeZone);
-    return slot.lastRun === tomorrowKey ? null : tomorrowKey;
-  }
-
-  // 3. Check yesterday's candidate (now is near midnight 00:05, slot is previous day 23:55)
-  const diffYesterday = (nowMin + 1440) - slotMin;
-  if (Math.abs(diffYesterday) <= 15) {
-    const yesterdayDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const yesterdayKey = zonedDayKey(yesterdayDate, timeZone);
-    return slot.lastRun === yesterdayKey ? null : yesterdayKey;
-  }
-
-  return null;
-}
-
 export function isSlotDue(
   slot: ScheduleSlot,
   now: Date,
   timeZone: string
 ): boolean {
-  return getDueTargetDateKey(slot, now, timeZone) !== null;
+  const p = zonedParts(now, timeZone);
+  const [hh, mm] = slot.time.split(":").map(Number);
+  const slotMin = hh * 60 + mm;
+  const nowMin = p.hour * 60 + p.minute;
+
+  const diff = nowMin - slotMin;
+  if (Math.abs(diff) <= 15) {
+    const todayKey = zonedDayKey(now, timeZone);
+    return slot.lastRun !== todayKey;
+  }
+  return false;
 }
 
 export default async () => {
@@ -117,83 +93,110 @@ export default async () => {
     commitsCommitted: 0,
     errors: [] as string[],
   };
-  let processed = 0;
 
   try {
-    const pages = store.list({ prefix: "user:", paginate: true });
-    for await (const page of pages) {
-      for (const { key } of page.blobs) {
-        if (processed >= MAX_USERS_PER_TICK || Date.now() - started > BUDGET_MS) break;
+    // Collect ALL user keys and sort numerically to prevent
+    // lexicographic starvation (user:1, user:10, user:100, user:2, ...)
+    const allKeys: string[] = [];
+  for await (const page of store.list({ prefix: "user:", paginate: true })) {
+    for (const { key } of page.blobs) {
+      allKeys.push(key);
+    }
+  }
 
-        // Per-user try/catch: one corrupt tenant must NEVER halt the platform.
+    // Sort by numeric ID: user:1 → user:2 → user:10 → user:100
+    allKeys.sort((a: string, b: string) => {
+      const idA = parseInt(a.substring(5), 10);
+      const idB = parseInt(b.substring(5), 10);
+      return idA - idB;
+    });
+
+    // Randomize start offset to distribute load evenly across ticks
+    const startIndex = Math.floor(Math.random() * Math.max(allKeys.length, 1));
+    const orderedKeys = [
+      ...allKeys.slice(startIndex),
+      ...allKeys.slice(0, startIndex),
+    ];
+
+    let processed = 0;
+    for (const key of orderedKeys) {
+      if (processed >= MAX_USERS_PER_TICK || Date.now() - started > BUDGET_MS) break;
+
+      // Per-user try/catch: one corrupt tenant must NEVER halt the platform.
+      try {
+        const raw = await store.get(key, { type: "text" });
+        if (!raw) continue;
+        let user: UserConfig;
         try {
-          const raw = await store.get(key, { type: "text" });
-          if (!raw) continue;
-          let user: UserConfig;
+          user = JSON.parse(raw) as UserConfig;
+        } catch {
+          continue; // Skip corrupt records
+        }
+
+        if (!user.encryptedToken || !user.repo) continue; // incomplete onboarding
+        if (!user.slots || user.slots.length === 0) continue; // no schedule
+
+        // Validate slot counts to prevent infinite retries or budget blowouts
+        const validSlots = user.slots.filter(
+          (s) => s.count >= 1 && s.count <= 3 && s.time && /^\d{2}:\d{2}$/.test(s.time)
+        );
+        if (validSlots.length === 0) continue;
+
+        const timezone = user.timezone || "Asia/Kolkata";
+        let token: string | null = null;
+
+        for (const slot of validSlots) {
+          if (!isSlotDue(slot, now, timezone)) continue;
+
+          const previousLastRun = slot.lastRun;
+          // WRITE-AHEAD: mark and save the slot as run BEFORE executing commits
+          // so function timeouts or crashes never cause duplicate commit storms.
+          slot.lastRun = zonedDayKey(new Date(), timezone);
+          user.updatedAt = new Date().toISOString();
+          await store.set(key, JSON.stringify(user));
+          stats.slotsFired++;
+
           try {
-            user = JSON.parse(raw) as UserConfig;
-          } catch {
-            continue;
-          }
+            if (!token) {
+              token = await decryptSecret(user.encryptedToken);
+            }
 
-          if (!user.encryptedToken || !user.repo) continue; // incomplete onboarding
+            // Validate count is within safe bounds before executing
+            const batchCount = Math.min(slot.count, 10); // Hard cap at 10 per burst
 
-          const timezone = user.timezone || "Asia/Kolkata";
-          let token: string | null = null;
+            const result = await makeBatchCommits(
+              { token, owner: user.owner, repo: user.repo, targetFile: user.targetFile },
+              batchCount,
+              `${slot.time} ${timezone}`
+            );
 
-          for (const slot of user.slots ?? []) {
-            const targetDateKey = getDueTargetDateKey(slot, now, timezone);
-            if (!targetDateKey) continue;
-
-            const previousLastRun = slot.lastRun;
-            // WRITE-AHEAD: mark and save the slot as run BEFORE executing commits
-            // so function timeouts or crashes never cause duplicate commit storms.
-            slot.lastRun = targetDateKey;
-            user.updatedAt = new Date().toISOString();
-            await store.set(key, JSON.stringify(user));
-            stats.slotsFired++;
-
-            try {
-              if (!token) {
-                token = await decryptSecret(user.encryptedToken);
-              }
-
-              const result = await makeBatchCommits(
-                { token, owner: user.owner, repo: user.repo, targetFile: user.targetFile },
-                slot.count,
-                `${slot.time} ${timezone}`
-              );
-
-              stats.commitsCommitted += result.committed;
-              if (result.committed === 0) {
-                // If 0 commits succeeded, rollback lastRun so it can retry later
-                slot.lastRun = previousLastRun;
-                user.updatedAt = new Date().toISOString();
-                await store.set(key, JSON.stringify(user));
-              }
-              if (result.errors.length) {
-                stats.errors.push(...result.errors.map((e) => `${key}: ${e}`));
-              }
-            } catch (commitErr: any) {
-              // Rollback on unexpected commit error
+            stats.commitsCommitted += result.committed;
+            if (result.committed === 0) {
+              // If 0 commits succeeded, rollback lastRun so it can retry later
               slot.lastRun = previousLastRun;
               user.updatedAt = new Date().toISOString();
               await store.set(key, JSON.stringify(user));
-              stats.errors.push(`${key}: ${commitErr.message}`);
             }
-
-            if (Date.now() - started > BUDGET_MS) break;
+            if (result.errors.length) {
+              stats.errors.push(...result.errors.map((e) => `${key}: ${e}`));
+            }
+          } catch (commitErr: any) {
+            // Rollback on unexpected commit error
+            slot.lastRun = previousLastRun;
+            user.updatedAt = new Date().toISOString();
+            await store.set(key, JSON.stringify(user));
+            stats.errors.push(`${key}: ${commitErr.message}`);
           }
 
-          processed++;
-          stats.usersProcessed++;
-        } catch (err: any) {
-          stats.errors.push(`${key}: ${err.message}`);
-          processed++;
+          if (Date.now() - started > BUDGET_MS) break;
         }
-      }
 
-      if (Date.now() - started > BUDGET_MS || processed >= MAX_USERS_PER_TICK) break;
+        processed++;
+        stats.usersProcessed++;
+      } catch (err: any) {
+        stats.errors.push(`${key}: ${err.message}`);
+        processed++;
+      }
     }
   } catch (err: any) {
     console.error("Heartbeat failed:", err);

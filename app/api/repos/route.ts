@@ -21,7 +21,8 @@ export async function GET(request: Request) {
     return json({ repos });
   } catch (err: any) {
     console.error("Failed to list repos:", err);
-    return json({ error: err.message }, 500);
+    const status = err.message?.includes("token") || err.message?.includes("authentication") ? 401 : 500;
+    return json({ error: "Failed to list repositories" }, status);
   }
 }
 

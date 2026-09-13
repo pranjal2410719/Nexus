@@ -1,5 +1,11 @@
 # Nexus — Open Source Multi-Tenant Commit Engine
 
+## Current Version
+
+Nexus v3.1.0 — Security-hardened, scheduler-fixed, atomic-capped release.
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
+
+
 Nexus is a **serverless, multi-tenant GitHub commit scheduler** — a Next.js app deployed on Netlify. Every user connects their *own* repository, configures their own daily bursts, and Nexus fires authentic conventional commits (`feat(dsa/trees)`, `fix(dsa/dp)`, …) with verified C++ implementations and complexity breakdowns — **fully isolated per user**.
 
 Sign in with GitHub OAuth, encrypted tokens at rest, per-user data in Netlify Blobs, and a single heartbeat scheduler that serves everyone.
@@ -44,19 +50,31 @@ Sign in with GitHub OAuth, encrypted tokens at rest, per-user data in Netlify Bl
 | Route / File | Role |
 |---|---|
 | `app/page.tsx` | Frontend — landing + dashboard (React, SayBriefly design) |
-| `app/api/auth/start` | Redirect to GitHub OAuth authorize |
-| `app/api/auth/callback` | Exchange code → token, store user (encrypted), set session |
-| `app/api/auth/logout` | Destroy session + clear cookie |
-| `app/api/me` | GET own config (never the token) |
-| `app/api/repos` | GET user's repo list for the picker |
-| `app/api/save-config` | POST validated per-user config |
-| `app/api/commit-now` | POST manual dispatch (daily cap) |
-| `app/api/health` | GET self-check — store mode, env presence, store round-trip (never leaks secrets) |
+| `app/status/page.tsx` | Service Status / health page |
+| `app/admin/page.tsx` | Admin dashboard (user management, system actions) |
+| `app/api/auth/start/route.ts` | Redirect to GitHub OAuth authorize |
+| `app/api/auth/callback/route.ts` | Exchange code → token, store user (encrypted), set session |
+| `app/api/auth/logout/route.ts` | POST destroy session + clear cookie |
+| `app/api/me/route.ts` | GET own config (never the token) |
+| `app/api/repos/route.ts` | GET user's repo list for the picker |
+| `app/api/save-config/route.ts` | POST validated per-user config |
+| `app/api/commit-now/route.ts` | POST manual dispatch (daily cap) |
+| `app/api/health/route.ts` | GET self-check — store mode, env presence, store round-trip |
 | `netlify/functions/heartbeat.ts` | ⭐ Scheduled function `*/15 * * * *` — fan-out scheduler |
-| `lib/commit-helper.ts` | Shared engine — `makeSingleCommit` / `makeBatchCommits` take an explicit user `CommitConfig` |
-| `lib/auth.ts` | Blob store access, sessions, cookie handling, `publicUser` sanitizer |
-| `lib/security.ts` | AES-GCM encrypt/decrypt of user tokens |
-| `lib/http.ts` | JSON + CORS response helpers |
+| `lib/core/commit-engine.ts` | Shared engine — `makeSingleCommit` / `makeBatchCommits` |
+| `lib/core/log-pruner.ts` | Sanitize paths and prune log entries |
+| `lib/core/task-generator.ts` | Generate realistic log entries |
+| `lib/github/client.ts` | Octokit client factory |
+| `lib/github/repo-service.ts` | List user's repositories |
+| `lib/storage/blob-store.ts` | Netlify Blobs / Local File Store abstraction |
+| `lib/storage/local-file-store.ts` | Dev-only file-backed store |
+| `lib/http/cors.ts` | CORS headers and handler |
+| `lib/http/response.ts` | JSON response helper |
+| `lib/auth/cookies.ts` | Session cookie utilities |
+| `lib/auth/permissions.ts` | Admin permission check |
+| `lib/auth/session.ts` | Session management and expiry |
+| `lib/auth/user.ts` | User lookup by session and request |
+| `lib/security/encryption.ts` | AES-GCM token encryption/decryption |
 
 ### Blob store layout
 
