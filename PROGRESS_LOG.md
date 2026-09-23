@@ -1,29 +1,5 @@
 # DSA Practice & Build Activity Log
 
-## [2026-09-22 05:15:14 UTC] perf(dsa/arrays): optimize Two Pointer approach for Trapping Rain Water problem
-
-**Module:** `dsa/arrays`  
-**Status:** Verified & Compiled  
-
-### Summary
-Reduced auxiliary space from O(N) left/right max arrays to O(1) space using two converging pointers.
-
-```cpp
-int trap(vector<int>& height) {
-    int left = 0, right = height.size() - 1;
-    int left_max = 0, right_max = 0, water = 0;
-    while (left < right) {
-        if (height[left] < height[right]) {
-            height[left] >= left_max ? (left_max = height[left]) : water += (left_max - height[left]);
-            left++;
-        } else {
-            height[right] >= right_max ? (right_max = height[right]) : water += (right_max - height[right]);
-            right--;
-        }
-    }
-    return water;
-}
-```
 ## [2026-09-22 05:15:15 UTC] perf(dsa/arrays): optimize Two Pointer approach for Trapping Rain Water problem
 
 **Module:** `dsa/arrays`  
@@ -107,5 +83,29 @@ void solveNQueens(int row, int n, int& count, int cols, int diag1, int diag2) {
         availablePositions -= p;
         solveNQueens(row + 1, n, count, cols | p, (diag1 | p) << 1, (diag2 | p) >> 1);
     }
+}
+```
+## [2026-09-23 05:15:17 UTC] perf(dsa/arrays): optimize Two Pointer approach for Trapping Rain Water problem
+
+**Module:** `dsa/arrays`  
+**Status:** Verified & Compiled  
+
+### Summary
+Reduced auxiliary space from O(N) left/right max arrays to O(1) space using two converging pointers.
+
+```cpp
+int trap(vector<int>& height) {
+    int left = 0, right = height.size() - 1;
+    int left_max = 0, right_max = 0, water = 0;
+    while (left < right) {
+        if (height[left] < height[right]) {
+            height[left] >= left_max ? (left_max = height[left]) : water += (left_max - height[left]);
+            left++;
+        } else {
+            height[right] >= right_max ? (right_max = height[right]) : water += (right_max - height[right]);
+            right--;
+        }
+    }
+    return water;
 }
 ```
