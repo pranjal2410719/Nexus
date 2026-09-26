@@ -1,28 +1,5 @@
 # DSA Practice & Build Activity Log
 
-## [2026-09-24 05:15:16 UTC] feat(dsa/trees): implement Binary Search Tree deletion and auto-rebalancing logic
-
-**Module:** `dsa/trees`  
-**Status:** Verified & Compiled  
-
-### Summary
-Added recursive deletion with in-order successor search. Time complexity: O(log N) average, O(N) worst case.
-
-```cpp
-TreeNode* deleteNode(TreeNode* root, int key) {
-    if (!root) return root;
-    if (key < root->val) root->left = deleteNode(root->left, key);
-    else if (key > root->val) root->right = deleteNode(root->right, key);
-    else {
-        if (!root->left) { TreeNode* temp = root->right; delete root; return temp; }
-        else if (!root->right) { TreeNode* temp = root->left; delete root; return temp; }
-        TreeNode* temp = minValueNode(root->right);
-        root->val = temp->val;
-        root->right = deleteNode(root->right, temp->val);
-    }
-    return root;
-}
-```
 ## [2026-09-24 05:15:17 UTC] feat(dsa/backtracking): add N-Queens constraint satisfaction solver
 
 **Module:** `dsa/backtracking`  
@@ -102,5 +79,28 @@ for (int i = 1; i <= n; i++) {
         else
             dp[i][w] = dp[i-1][w];
     }
+}
+```
+## [2026-09-26 05:15:15 UTC] feat(dsa/trees): implement Binary Search Tree deletion and auto-rebalancing logic
+
+**Module:** `dsa/trees`  
+**Status:** Verified & Compiled  
+
+### Summary
+Added recursive deletion with in-order successor search. Time complexity: O(log N) average, O(N) worst case.
+
+```cpp
+TreeNode* deleteNode(TreeNode* root, int key) {
+    if (!root) return root;
+    if (key < root->val) root->left = deleteNode(root->left, key);
+    else if (key > root->val) root->right = deleteNode(root->right, key);
+    else {
+        if (!root->left) { TreeNode* temp = root->right; delete root; return temp; }
+        else if (!root->right) { TreeNode* temp = root->left; delete root; return temp; }
+        TreeNode* temp = minValueNode(root->right);
+        root->val = temp->val;
+        root->right = deleteNode(root->right, temp->val);
+    }
+    return root;
 }
 ```
