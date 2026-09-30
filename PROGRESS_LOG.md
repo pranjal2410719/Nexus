@@ -1,26 +1,5 @@
 # DSA Practice & Build Activity Log
 
-## [2026-09-28 05:15:20 UTC] test(dsa/strings): add test cases for KMP string matching edge conditions
-
-**Module:** `dsa/strings`  
-**Status:** Verified & Compiled  
-
-### Summary
-Added unit coverage for empty pattern, single character repeating sequences, and non-matching long prefix cases.
-
-```cpp
-void computeLPSArray(string pat, int M, vector<int>& lps) {
-    int len = 0, i = 1;
-    lps[0] = 0;
-    while (i < M) {
-        if (pat[i] == pat[len]) { len++; lps[i] = len; i++; }
-        else {
-            if (len != 0) len = lps[len - 1];
-            else { lps[i] = 0; i++; }
-        }
-    }
-}
-```
 ## [2026-09-29 05:15:16 UTC] test(dsa/strings): add test cases for KMP string matching edge conditions
 
 **Module:** `dsa/strings`  
@@ -102,6 +81,27 @@ for (int i = 1; i <= n; i++) {
             dp[i][w] = max(values[i-1] + dp[i-1][w-weights[i-1]], dp[i-1][w]);
         else
             dp[i][w] = dp[i-1][w];
+    }
+}
+```
+## [2026-09-30 05:15:17 UTC] test(dsa/strings): add test cases for KMP string matching edge conditions
+
+**Module:** `dsa/strings`  
+**Status:** Verified & Compiled  
+
+### Summary
+Added unit coverage for empty pattern, single character repeating sequences, and non-matching long prefix cases.
+
+```cpp
+void computeLPSArray(string pat, int M, vector<int>& lps) {
+    int len = 0, i = 1;
+    lps[0] = 0;
+    while (i < M) {
+        if (pat[i] == pat[len]) { len++; lps[i] = len; i++; }
+        else {
+            if (len != 0) len = lps[len - 1];
+            else { lps[i] = 0; i++; }
+        }
     }
 }
 ```
